@@ -3,6 +3,25 @@ import User from "../models/user.js";
 import { createHttpError } from "../utils/httpError.js";
 
 const normalizeEmail = (value) => String(value ?? "").trim().toLowerCase();
+const normalizeRole = (value) => {
+  const normalizedValue = String(value ?? "")
+    .trim()
+    .toLowerCase();
+
+  if (normalizedValue === "admin" || normalizedValue === "administrador") {
+    return "Admin";
+  }
+
+  if (normalizedValue === "profesor") {
+    return "Profesor";
+  }
+
+  if (normalizedValue === "estudiante") {
+    return "Estudiante";
+  }
+
+  return "Estudiante";
+};
 const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 const findUserByEmail = async (email) =>
@@ -46,7 +65,7 @@ export const createUserRecord = async ({
     name: String(name).trim(),
     email: normalizedEmail,
     password: hashedPassword,
-    rol,
+    rol: normalizeRole(rol),
     estado,
   });
 
@@ -70,7 +89,7 @@ export const updateUserRecord = async (
     updateData.email = normalizedEmail;
   }
   if (password) updateData.password = await bcrypt.hash(password, 10);
-  if (rol) updateData.rol = rol;
+  if (rol) updateData.rol = normalizeRole(rol);
   if (typeof estado === "boolean") updateData.estado = estado;
 
   const user = await User.findByIdAndUpdate(id, updateData, {

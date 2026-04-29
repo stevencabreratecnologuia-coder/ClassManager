@@ -221,11 +221,31 @@
 
   const applyTheme = () => setTheme(getTheme());
 
+  const normalizeRole = (value) => {
+    const normalizedValue = String(value ?? "")
+      .trim()
+      .toLowerCase();
+
+    if (normalizedValue === "admin" || normalizedValue === "administrador") {
+      return "Admin";
+    }
+
+    if (normalizedValue === "profesor") {
+      return "Profesor";
+    }
+
+    if (normalizedValue === "estudiante") {
+      return "Estudiante";
+    }
+
+    return "Estudiante";
+  };
+
   const normalizeUser = (user) => ({
     id: String(user.id ?? user._id ?? ""),
     name: user.name ?? "Sin nombre",
     email: user.email ?? "",
-    rol: user.rol ?? "Estudiante",
+    rol: normalizeRole(user.rol),
     estado: user.estado ?? true,
     lastSeenAt: nowIso(),
   });
@@ -250,10 +270,46 @@
     return String(submission?.files ?? "").trim() || "Sin archivo";
   };
 
-  const getUsers = () => ensureArray(KEYS.users);
+  const getUsers = () => {
+    const users = ensureArray(KEYS.users);
+    const normalizedUsers = users.map((user) => normalizeUser(user));
+    const hasChanges = normalizedUsers.some(
+      (user, index) =>
+        user.rol !== users[index]?.rol ||
+        user.email !== users[index]?.email ||
+        user.id !== String(users[index]?.id ?? users[index]?._id ?? ""),
+    );
+
+    if (hasChanges) {
+      saveUsers(normalizedUsers);
+    }
+
+    return normalizedUsers;
+  };
   const saveUsers = (users) => write(KEYS.users, users);
 
-  const getAuthUsers = () => ensureArray(KEYS.authUsers);
+  const getAuthUsers = () => {
+    const users = ensureArray(KEYS.authUsers);
+    const normalizedUsers = users.map((user) => ({
+      ...user,
+      id: String(user.id ?? user._id ?? ""),
+      email: String(user.email ?? "").trim().toLowerCase(),
+      rol: normalizeRole(user.rol),
+      estado: user.estado ?? true,
+    }));
+    const hasChanges = normalizedUsers.some(
+      (user, index) =>
+        user.rol !== users[index]?.rol ||
+        user.email !== users[index]?.email ||
+        user.id !== String(users[index]?.id ?? users[index]?._id ?? ""),
+    );
+
+    if (hasChanges) {
+      saveAuthUsers(normalizedUsers);
+    }
+
+    return normalizedUsers;
+  };
   const saveAuthUsers = (users) => write(KEYS.authUsers, users);
 
   const replaceKnownUsers = (users = []) => {
@@ -435,7 +491,7 @@
       name: user.name ?? "Sin nombre",
       email: String(user.email ?? "").trim().toLowerCase(),
       password: String(user.password ?? ""),
-      rol: user.rol ?? "Estudiante",
+      rol: normalizeRole(user.rol),
       estado: user.estado ?? true,
       lastSeenAt: nowIso(),
     };
@@ -512,7 +568,25 @@
     return session;
   };
 
-  const getSession = () => read(KEYS.session, null);
+  const getSession = () => {
+    const session = read(KEYS.session, null);
+    if (!session?.user) return session;
+
+    const normalizedUser = normalizeUser(session.user);
+    if (normalizedUser.rol === session.user.rol) {
+      return session;
+    }
+
+    const nextSession = {
+      ...session,
+      user: {
+        ...session.user,
+        ...normalizedUser,
+      },
+    };
+    write(KEYS.session, nextSession);
+    return nextSession;
+  };
 
   const setSession = (authData) => {
     const authUser = upsertAuthUser(authData.user);

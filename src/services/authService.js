@@ -8,6 +8,25 @@ const normalizeEmail = (value) =>
     .trim()
     .toLowerCase();
 const normalizeText = (value) => String(value ?? "").trim();
+const normalizeRole = (value) => {
+  const normalizedValue = String(value ?? "")
+    .trim()
+    .toLowerCase();
+
+  if (normalizedValue === "admin" || normalizedValue === "administrador") {
+    return "Admin";
+  }
+
+  if (normalizedValue === "profesor") {
+    return "Profesor";
+  }
+
+  if (normalizedValue === "estudiante") {
+    return "Estudiante";
+  }
+
+  return "Estudiante";
+};
 const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 const findUserByEmail = async (email) => {
@@ -18,8 +37,9 @@ const findUserByEmail = async (email) => {
 };
 
 const buildAuthResponse = (user) => {
+  const normalizedRole = normalizeRole(user.rol);
   const token = jwt.sign(
-    { id: user._id, rol: user.rol, email: user.email },
+    { id: user._id, rol: normalizedRole, email: user.email },
     process.env.JWT_SECRET || "dev_secret",
     { expiresIn: "7d" },
   );
@@ -30,7 +50,7 @@ const buildAuthResponse = (user) => {
       id: user._id,
       name: user.name,
       email: user.email,
-      rol: user.rol,
+      rol: normalizedRole,
       estado: user.estado,
     },
   };
@@ -76,7 +96,7 @@ export const createTestAdmin = async () => {
     name: "Admin de Prueba",
     email,
     password: hashedPassword,
-    rol: "Administrador",
+    rol: "Admin",
     estado: true,
   });
   console.log(
@@ -100,8 +120,10 @@ export const loginUser = async ({ email, password }) => {
     throw createHttpError(403, "Tu cuenta esta inactiva. Contacta al administrador.");
   }
 
-  if (user.email !== normalizedEmail) {
+  const normalizedRole = normalizeRole(user.rol);
+  if (user.email !== normalizedEmail || user.rol !== normalizedRole) {
     user.email = normalizedEmail;
+    user.rol = normalizedRole;
     await user.save();
   }
 

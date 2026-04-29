@@ -1,6 +1,26 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
 
+const normalizeRole = (value) => {
+  const normalizedValue = String(value ?? "")
+    .trim()
+    .toLowerCase();
+
+  if (normalizedValue === "admin" || normalizedValue === "administrador") {
+    return "Admin";
+  }
+
+  if (normalizedValue === "profesor") {
+    return "Profesor";
+  }
+
+  if (normalizedValue === "estudiante") {
+    return "Estudiante";
+  }
+
+  return "Estudiante";
+};
+
 export const authMiddleware = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization || "";
@@ -33,9 +53,15 @@ export const authMiddleware = async (req, res, next) => {
       });
     }
 
+    const normalizedRole = normalizeRole(user.rol);
+    if (user.rol !== normalizedRole) {
+      user.rol = normalizedRole;
+      await user.save();
+    }
+
     req.user = {
       id: String(user._id),
-      rol: user.rol,
+      rol: normalizedRole,
       email: user.email,
     };
     next();
