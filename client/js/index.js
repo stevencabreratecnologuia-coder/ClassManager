@@ -48,7 +48,9 @@ const goToDashboard = (role) => {
 const getErrorMessage = (result, fallback) =>
   result?.message || result?.error || fallback;
 
-const fetchWithTimeout = async (url, options = {}, timeoutMs = 1800) => {
+const DEFAULT_TIMEOUT_MS = 15000;
+
+const fetchWithTimeout = async (url, options = {}, timeoutMs = DEFAULT_TIMEOUT_MS) => {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -114,6 +116,15 @@ loginForm?.addEventListener("submit", async (event) => {
       goToDashboard(result.data.user.rol);
     }, 350);
   } catch (error) {
+    if (error?.name === "AbortError") {
+      showMessage(
+        loginMessage,
+        "error",
+        "El servidor tardo demasiado en responder. En Render puede pasar mientras despierta. Intenta de nuevo en unos segundos.",
+      );
+      return;
+    }
+
     const localSession = window.ClassManagerApp?.authenticateLocalUser?.(
       payload.email,
       payload.password,
@@ -128,7 +139,11 @@ loginForm?.addEventListener("submit", async (event) => {
       return;
     }
 
-    showMessage(loginMessage, "error", "No fue posible iniciar sesion.");
+    showMessage(
+      loginMessage,
+      "error",
+      getErrorMessage(error, "No fue posible iniciar sesion."),
+    );
   }
 });
 
@@ -197,7 +212,7 @@ registerForm?.addEventListener("submit", async (event) => {
         },
         body: JSON.stringify({ name, email, password }),
       },
-      1200,
+      DEFAULT_TIMEOUT_MS,
     )
       .then(async (response) => {
         if (!response.ok) return null;

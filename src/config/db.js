@@ -15,6 +15,8 @@ export const connectDB = async () => {
     return;
   }
 
+  console.log("process.env.MONGO_URI:", process.env.MONGO_URI);
+
   for (const [index, uri] of candidates.entries()) {
     try {
       await mongoose.connect(uri, {
