@@ -59,6 +59,7 @@ let adminChatHistory = [];
 let adminChatLoading = false;
 let userCreateRole = "Profesor";
 let userActionInFlight = false;
+const DEFAULT_REMOTE_TIMEOUT_MS = 15000;
 
 const syncUserCreateModalCopy = () => {
   const isAdmin = userCreateRole === "Admin";
@@ -89,7 +90,11 @@ const openUserCreateModal = (role = "Profesor") => {
   openTeacherModal();
 };
 
-const fetchWithTimeout = async (url, options = {}, timeoutMs = 5000) => {
+const fetchWithTimeout = async (
+  url,
+  options = {},
+  timeoutMs = DEFAULT_REMOTE_TIMEOUT_MS,
+) => {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -141,7 +146,7 @@ const ensureRemoteAdminSession = async () => {
         password: credentials.password,
       }),
     },
-    6000,
+    DEFAULT_REMOTE_TIMEOUT_MS,
   );
 
   const result = await response.json();
@@ -169,7 +174,7 @@ const fetchRemoteUsers = async () => {
         Authorization: `Bearer ${remoteSession.token}`,
       },
     },
-    6000,
+    DEFAULT_REMOTE_TIMEOUT_MS,
   );
 
   const result = await response.json();
@@ -715,7 +720,7 @@ const toggleUserStatus = async (userId, nextState) => {
           estado: nextState,
         }),
       },
-      6000,
+      DEFAULT_REMOTE_TIMEOUT_MS,
     );
 
     const result = await response.json();
@@ -731,6 +736,12 @@ const toggleUserStatus = async (userId, nextState) => {
     renderAdminPanels();
     alert(nextState ? "Usuario activado correctamente." : "Usuario desactivado correctamente.");
   } catch (error) {
+    if (error?.name === "AbortError") {
+      alert(
+        "El servidor tardo demasiado en responder. Si estas en Render, espera unos segundos y vuelve a intentarlo.",
+      );
+      return;
+    }
     alert(error.message || "No fue posible actualizar el estado del usuario.");
   } finally {
     userActionInFlight = false;
@@ -766,7 +777,7 @@ const deleteUserAccount = async (userId) => {
           Authorization: `Bearer ${remoteSession.token}`,
         },
       },
-      6000,
+      DEFAULT_REMOTE_TIMEOUT_MS,
     );
 
     const result = await response.json();
@@ -782,6 +793,12 @@ const deleteUserAccount = async (userId) => {
     renderAdminPanels();
     alert("Usuario borrado correctamente.");
   } catch (error) {
+    if (error?.name === "AbortError") {
+      alert(
+        "El servidor tardo demasiado en responder. Si estas en Render, espera unos segundos y vuelve a intentarlo.",
+      );
+      return;
+    }
     alert(error.message || "No fue posible borrar el usuario.");
   } finally {
     userActionInFlight = false;
@@ -890,7 +907,7 @@ teacherCreateForm?.addEventListener("submit", async (event) => {
           estado: true,
         }),
       },
-      6000,
+      DEFAULT_REMOTE_TIMEOUT_MS,
     );
 
     const result = await response.json();
@@ -905,6 +922,12 @@ teacherCreateForm?.addEventListener("submit", async (event) => {
     AdminApp.registerKnownUser(result.data);
     await syncUsersFromDatabase();
   } catch (error) {
+    if (error?.name === "AbortError") {
+      alert(
+        "El servidor tardo demasiado en responder. Si estas en Render, espera unos segundos y vuelve a intentarlo.",
+      );
+      return;
+    }
     alert(error.message || "No fue posible guardar el usuario en la base de datos.");
     return;
   }

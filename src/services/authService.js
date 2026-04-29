@@ -81,27 +81,68 @@ export const registerUser = async ({ name, email, password }) => {
   return buildAuthResponse(user);
 };
 
-export const createTestAdmin = async () => {
-  const email = "admin@test.com";
-  const password = "password123";
+export const createOrSyncAdmin = async () => {
+  const email = normalizeEmail(process.env.ADMIN_EMAIL || "admin@test.com");
+  const password = String(process.env.ADMIN_PASSWORD || "password123").trim();
+  const name = normalizeText(process.env.ADMIN_NAME || "Admin de Prueba");
 
-  const existingUser = await User.findOne({ email });
-  if (existingUser) {
-    console.log("El usuario de prueba ya existe.");
+  if (!email || !password || !name) {
+    console.warn(
+      "No se pudo preparar el admin inicial porque faltan ADMIN_NAME, ADMIN_EMAIL o ADMIN_PASSWORD.",
+    );
     return;
   }
 
+  const existingUser = await findUserByEmail(email);
   const hashedPassword = await bcrypt.hash(password, 10);
-  await User.create({
-    name: "Admin de Prueba",
-    email,
-    password: hashedPassword,
-    rol: "Admin",
-    estado: true,
-  });
-  console.log(
-    "Usuario de prueba creado con exito. Email: admin@test.com, Contrasena: password123",
-  );
+
+  if (!existingUser) {
+    await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      rol: "Admin",
+      estado: true,
+    });
+    console.log(`Admin inicial creado: ${email}`);
+    return;
+  }
+
+  let shouldSave = false;
+
+  if (existingUser.name !== name) {
+    existingUser.name = name;
+    shouldSave = true;
+  }
+
+  if (existingUser.email !== email) {
+    existingUser.email = email;
+    shouldSave = true;
+  }
+
+  if (existingUser.rol !== "Admin") {
+    existingUser.rol = "Admin";
+    shouldSave = true;
+  }
+
+  if (existingUser.estado === false) {
+    existingUser.estado = true;
+    shouldSave = true;
+  }
+
+  const passwordMatches = await bcrypt.compare(password, existingUser.password);
+  if (!passwordMatches) {
+    existingUser.password = hashedPassword;
+    shouldSave = true;
+  }
+
+  if (shouldSave) {
+    await existingUser.save();
+    console.log(`Admin inicial actualizado: ${email}`);
+    return;
+  }
+
+  console.log(`Admin inicial listo: ${email}`);
 };
 
 export const loginUser = async ({ email, password }) => {
