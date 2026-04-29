@@ -1,0 +1,1085 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClassManager | Dashboard Admin</title>
+    <link rel="stylesheet" href="./css/output.css" />
+  </head>
+  <body class="min-h-screen bg-slate-950 text-slate-100">
+    <div
+      class="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(20,184,166,0.14),_transparent_24%),radial-gradient(circle_at_bottom_right,_rgba(249,115,22,0.12),_transparent_24%),linear-gradient(180deg,_#020617_0%,_#0f172a_48%,_#111827_100%)]"
+    >
+      <div
+        class="mx-auto grid min-h-screen max-w-[1600px] lg:grid-cols-[290px_1fr]"
+      >
+        <aside
+          class="border-b border-white/10 bg-slate-950/80 px-5 py-6 backdrop-blur-xl lg:border-b-0 lg:border-r lg:px-6"
+        >
+          <div class="flex items-center gap-4">
+            <div
+              class="flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-400 text-lg font-black text-slate-950 shadow-lg shadow-teal-950/30 transform transition-all duration-500 hover:bg-teal-300 hover:scale-110"
+            >
+              CM
+            </div>
+            <div>
+              <p class="text-xl font-black tracking-tight text-white">
+                ClassManager
+              </p>
+              <p class="text-sm text-slate-400">Panel de administrador</p>
+            </div>
+          </div>
+
+          <div
+            class="mt-8 rounded-3xl border border-teal-400/20 bg-teal-400/10 p-4 transform transition-all duration-500 hover:bg-teal-400/30 hover:scale-110"
+          >
+            <p
+              class="text-xs font-extrabold uppercase tracking-[0.22em] text-teal-300"
+            >
+              Acceso actual
+            </p>
+            <p class="mt-3 text-lg font-black text-white">
+              Administrador general
+            </p>
+            <p class="mt-2 text-sm leading-6 text-teal-100/75">
+              Control total del sistema, usuarios, métricas institucionales y
+              supervisión académica.
+            </p>
+          </div>
+
+          <nav class="mt-8 space-y-2">
+            <a
+              href="#resumen"
+              class="flex items-center justify-between rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-sm font-bold text-white transition hover:bg-white/15"
+            >
+              <span>Resumen general</span>
+              <span class="text-teal-300">01</span>
+            </a>
+            <a
+              href="#usuarios"
+              class="flex items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold text-slate-300 transition hover:bg-white/5 hover:text-white"
+            >
+              <span>Gestión de usuarios</span>
+              <span>02</span>
+            </a>
+            <a
+              href="#estadisticas"
+              class="flex items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold text-slate-300 transition hover:bg-white/5 hover:text-white"
+            >
+              <span>Estadísticas</span>
+              <span>03</span>
+            </a>
+            <a
+              href="#promedios"
+              class="flex items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold text-slate-300 transition hover:bg-white/5 hover:text-white"
+            >
+              <span>Promedios por curso</span>
+              <span>04</span>
+            </a>
+            <a
+              href="#ia"
+              class="flex items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold text-slate-300 transition hover:bg-white/5 hover:text-white"
+            >
+              <span>Monitoreo IA</span>
+              <span>05</span>
+            </a>
+            <a
+              href="#actividad"
+              class="flex items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold text-slate-300 transition hover:bg-white/5 hover:text-white"
+            >
+              <span>Actividad reciente</span>
+              <span>06</span>
+            </a>
+          </nav>
+
+          <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+            <div class="rounded-3xl border border-white/10 bg-white/5 p-4">
+              <p
+                class="text-xs font-extrabold uppercase tracking-[0.18em] text-amber-300"
+              >
+                Gestión rápida
+              </p>
+              <div class="mt-4 space-y-3">
+                  <button
+                    id="create-teacher-quick"
+                    type="button"
+                    class="w-full rounded-2xl bg-teal-400 px-4 py-3 text-sm font-black text-slate-950 transform transition-all duration-500 hover:bg-teal-300 hover:scale-110"
+                  >
+                    Crear profesor
+                  </button>
+                  <button
+                    id="create-admin"
+                    type="button"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-bold text-white transform transition-all duration-500 hover:bg-white/30 hover:scale-110"
+                  >
+                    Crear administrador
+                  </button>
+              </div>
+            </div>
+
+            <div
+              class="rounded-3xl border border-white/10 bg-white/5 p-4 transform transition-all duration-500 hover:bg-white/30 hover:scale-110"
+            >
+              <p class="text-sm font-extrabold text-white">
+                Estado institucional
+              </p>
+              <div class="mt-4 space-y-3 text-sm text-slate-400">
+                <div class="flex items-center justify-between">
+                  <span>Usuarios activos</span>
+                  <span id="users-actives" class="font-bold text-teal-300"
+                    >0%</span
+                  >
+                </div>
+                <div class="flex items-center justify-between">
+                  <span>Tareas revisadas</span>
+                  <span id="tasks-revised" class="font-bold text-amber-300"
+                    >0%</span
+                  >
+                </div>
+                <div class="flex items-center justify-between">
+                  <span>Alertas IA</span>
+                  <span id="ia-alerts" class="font-bold text-rose-300"
+                    >0 casos</span
+                  >
+                </div>
+              </div>
+          </div>
+            <div class="mt-4">
+                <div class="w-full">
+                    <button
+                    id="close-session"
+                    class="w-full rounded-2xl bg-rose-400 px-4 py-3 text-sm font-black text-slate-950 transform transition-all duration-500 hover:bg-rose-300 hover:scale-110"
+                    >
+                    Cerrar Sesión
+                </button>
+            </div>
+        </div>
+    </aside>
+        <main class="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+          <header
+            class="rounded-[2rem] border border-white/10 bg-white/5 p-5 shadow-2xl shadow-black/20 backdrop-blur-xl sm:p-6"
+          >
+            <div
+              class="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between"
+            >
+              <div>
+                <p
+                  class="text-xs font-extrabold uppercase tracking-[0.22em] text-teal-300"
+                >
+                  Dashboard Admin
+                </p>
+                <h1
+                  class="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl"
+                >
+                  Centro de control administrativo de ClassManager
+                </h1>
+                <p
+                  class="mt-3 max-w-3xl text-sm leading-7 text-slate-400 sm:text-base"
+                >
+                  Supervisa usuarios, rendimiento académico, indicadores
+                  institucionales y los procesos potenciados por inteligencia
+                  artificial desde un solo lugar.
+                </p>
+              </div>
+
+              <div class="grid gap-3 sm:grid-cols-2">
+                <button
+                  id="create-teacher"
+                  class="rounded-2xl bg-teal-400 px-5 py-3 text-sm font-black text-slate-950 transform transition-all duration-500 hover:bg-teal-300 hover:scale-110"
+                >
+                  Registrar profesor
+                </button>
+                <button
+                  type="button"
+                  id="export-report"
+                  class="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-bold text-white transform transition-all duration-500 hover:bg-white/30 hover:scale-110"
+                >
+                  Exportar Excel
+                </button>
+              </div>
+            </div>
+          </header>
+
+          <section
+            id="resumen"
+            class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+          >
+            <article
+              class="rounded-[1.75rem] border border-white/10 bg-slate-900/70 p-5 backdrop-blur-xl transform transition-all duration-500 hover:bg-slate-800 hover:scale-110"
+            >
+              <p class="text-sm font-bold text-slate-400">Total usuarios</p>
+              <p id="total-users" class="mt-4 text-4xl font-black text-white">
+                0
+              </p>
+              <div class="mt-3 flex items-center justify-between text-sm">
+                <span id="new-users" class="text-teal-300">+0 este mes</span>
+                <span class="text-slate-500">Creados</span>
+              </div>
+            </article>
+
+            <article
+              class="rounded-[1.75rem] border border-white/10 bg-slate-900/70 p-5 backdrop-blur-xl transform transition-all duration-500 hover:bg-slate-800 hover:scale-110"
+            >
+              <p class="text-sm font-bold text-slate-400">Profesores activos</p>
+              <p
+                id="teachers-actives"
+                class="mt-4 text-4xl font-black text-white"
+              >
+                0
+              </p>
+              <div class="mt-3 flex items-center justify-between text-sm">
+                <span id="new-teachers" class="text-teal-300">+0 este mes</span>
+                <span class="text-slate-500">Registrados</span>
+              </div>
+            </article>
+
+            <article
+              class="rounded-[1.75rem] border border-white/10 bg-slate-900/70 p-5 backdrop-blur-xl transform transition-all duration-500 hover:bg-slate-800 hover:scale-110"
+            >
+              <p class="text-sm font-bold text-slate-400">
+                Estudiantes activos
+              </p>
+              <p
+                id="students-actives"
+                class="mt-4 text-4xl font-black text-white"
+              >
+                0
+              </p>
+              <div class="mt-3 flex items-center justify-between text-sm">
+                <span id="new-students" class="text-teal-300">+0 este mes</span>
+                <span class="text-slate-500">Registrados</span>
+              </div>
+            </article>
+
+            <article
+              class="rounded-[1.75rem] border border-white/10 bg-slate-900/70 p-5 backdrop-blur-xl transform transition-all duration-500 hover:bg-slate-800 hover:scale-110"
+            >
+              <p class="text-sm font-bold text-slate-400">Promedio global</p>
+              <p id="global-score" class="mt-4 text-4xl font-black text-white">
+                0
+              </p>
+              <div class="mt-3 flex items-center justify-between text-sm">
+                <span class="text-teal-300">Nivel alto</span>
+                <span class="text-slate-500">Sobre 5.0</span>
+              </div>
+            </article>
+          </section>
+
+          <section class="mt-6 grid gap-6 2xl:grid-cols-[1.2fr_0.8fr]">
+            <div
+              id="usuarios"
+              class="rounded-[2rem] border border-white/10 bg-white/5 p-5 shadow-2xl shadow-black/20 backdrop-blur-xl sm:p-6"
+            >
+              <div
+                class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div>
+                  <p
+                    class="text-xs font-extrabold uppercase tracking-[0.2em] text-amber-300"
+                  >
+                    Gestión de usuarios
+                  </p>
+                  <h2 class="mt-2 text-2xl font-black text-white">
+                    Profesores, estudiantes y administradores
+                  </h2>
+                  <p class="text-sm text-slate-500">
+                    Control total de los usuarios.
+                  </p>
+                </div>
+
+                <div class="flex flex-wrap gap-3 mt-3">
+                <button
+                  type="button"
+                  id="export-csv"
+                  class="rounded-2xl bg-teal-400 px-4 py-3 text-sm font-black text-slate-950 transform transition-all duration-500 hover:bg-teal-300 hover:scale-110"
+                >
+                  Exportar Excel
+                </button>
+                </div>
+              </div>
+
+              <div
+                class="mt-6 overflow-hidden rounded-[1.5rem] border border-white/10"
+              >
+              <div
+                  class="flex min-w-[920px] items-center gap-6 bg-white/5 px-4 py-3 text-xs font-extrabold uppercase tracking-[0.18em] text-slate-400"
+                >
+                  <div class="w-[180px] border-r border-white/10 pr-6" id="name">
+                    Nombre
+                  </div>
+                  <div class="w-[300px] border-r border-white/10 pr-6" id="email">
+                    Email
+                  </div>
+                  <div class="w-[120px] border-r border-white/10 pr-6" id="role">
+                    Rol
+                  </div>
+                  <div class="w-[120px] border-r border-white/10 pr-6" id="status">
+                    Estado
+                  </div>
+                    <div class="w-[160px] text-right">
+                      Ultimo acceso
+                    </div>
+                    <div id="actions" class="w-[220px] text-right">
+                      Acciones
+                    </div>
+                </div>
+
+                <div
+                  id="usuarios-lista"
+                  class="divide-y divide-white/10 overflow-x-auto"
+                ></div>
+              </div>
+
+              <section
+                class="mt-6 rounded-[1.5rem] border border-white/10 bg-slate-900/70 p-5"
+              >
+                <p
+                  class="text-xs font-extrabold uppercase tracking-[0.18em] text-teal-300"
+                >
+                  Gestion de grados
+                </p>
+                <h3 class="mt-2 text-xl font-black text-white">
+                  Asignar grado a profesor
+                </h3>
+                <p class="mt-2 text-sm text-slate-400">
+                  El administrador define el grado, asigna el profesor y puede
+                  vincular estudiantes al curso.
+                </p>
+
+                <form id="classroom-form" class="mt-5 grid gap-4 lg:grid-cols-2">
+                  <div>
+                    <label
+                      for="classroom-grade"
+                      class="text-sm font-bold text-slate-200"
+                    >
+                      Grado
+                    </label>
+                    <input
+                      id="classroom-grade"
+                      type="text"
+                      placeholder="Ej. 10-B"
+                      class="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500 focus:border-teal-300"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      for="classroom-teacher"
+                      class="text-sm font-bold text-slate-200"
+                    >
+                      Profesor
+                    </label>
+                    <select
+                      id="classroom-teacher"
+                      class="mt-2 w-full rounded-2xl border border-white/10 bg-white px-4 py-3 text-sm font-semibold text-slate-900 outline-none focus:border-teal-300"
+                      style="color-scheme: light; background-color: #ffffff; color: #0f172a;"
+                    >
+                      <option value="">Selecciona un profesor</option>
+                    </select>
+                  </div>
+
+                  <div class="lg:col-span-2">
+                    <label class="text-sm font-bold text-slate-200">
+                      Estudiantes del grado
+                    </label>
+                    <div
+                      id="classroom-students"
+                      class="mt-3 grid gap-3 md:grid-cols-2"
+                    ></div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    class="rounded-2xl bg-teal-400 px-5 py-3 text-sm font-black text-slate-950 transition duration-500 hover:bg-teal-300 hover:scale-105"
+                  >
+                    Guardar grado
+                  </button>
+                </form>
+
+                <div id="classroom-list" class="mt-6 space-y-4"></div>
+              </section>
+            </div>
+
+            <div class="grid gap-6">
+              <section
+                id="estadisticas"
+                class="rounded-[2rem] border border-white/10 bg-white/5 p-5 shadow-2xl shadow-black/20 backdrop-blur-xl sm:p-6"
+              >
+                <p
+                  class="text-xs font-extrabold uppercase tracking-[0.2em] text-amber-300"
+                >
+                  Estadísticas académicas
+                </p>
+                <h2 class="mt-2 text-2xl font-black text-white">
+                  Rendimiento institucional
+                </h2>
+
+                <div class="mt-6 space-y-5">
+                  <div>
+                    <div class="mb-2 flex items-center justify-between text-sm">
+                      <span class="text-slate-300">Entrega de tareas</span>
+                      <span id="task-sent" class="font-bold text-white"
+                        >0%</span
+                      >
+                    </div>
+                    <div
+                      id="task-sent-bar"
+                      class="h-3 rounded-full bg-white/10"
+                    >
+                      <div class="h-3 w-[0%] rounded-full"></div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="mb-2 flex items-center justify-between text-sm">
+                      <span class="text-slate-300">Participación en foros</span>
+                      <span
+                        id="forum-participation"
+                        class="font-bold text-white"
+                        >0%</span
+                      >
+                    </div>
+                    <div
+                      id="forum-participation-bar"
+                      class="h-3 rounded-full bg-white/10"
+                    >
+                      <div class="h-3 w-[0%] rounded-full"></div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="mb-2 flex items-center justify-between text-sm">
+                      <span class="text-slate-300"
+                        >Validación de comprensión</span
+                      >
+                      <span id="comprension" class="font-bold text-white"
+                        >0%</span
+                      >
+                    </div>
+                    <div
+                      id="comprension-bar"
+                      class="h-3 rounded-full bg-white/10"
+                    >
+                      <div class="h-3 w-[0%] rounded-full"></div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </section>
+
+          <section id="ia" class="mt-6 grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
+            <section
+              id="promedios"
+              class="rounded-[2rem] border border-white/10 bg-white/5 p-5 shadow-2xl shadow-black/20 backdrop-blur-xl sm:p-6"
+            >
+              <p
+                class="text-xs font-extrabold uppercase tracking-[0.2em] text-amber-300"
+              >
+                Promedios por grado
+              </p>
+              <h2 class="mt-2 text-2xl font-black text-white">
+                Cursos destacados
+              </h2>
+              <div id="cursos-destacados-lista" class="mt-6 space-y-4"></div>
+            </section>
+            <article
+              class="rounded-[2rem] border border-white/10 bg-white/5 p-5 shadow-2xl shadow-black/20 backdrop-blur-xl sm:p-6"
+            >
+              <p
+                class="text-xs font-extrabold uppercase tracking-[0.2em] text-amber-300"
+              >
+                Inteligencia artificial
+              </p>
+              <h2 class="mt-2 text-2xl font-black text-white">
+                Monitoreo de uso de IA y apoyo pedagógico
+              </h2>
+
+              <div class="mt-6 grid gap-4 sm:grid-cols-2">
+                <div
+                  class="rounded-3xl border border-white/10 bg-slate-900/80 p-4 transform transition-all duration-500 hover:bg-slate-600/80 hover:scale-110"
+                >
+                  <p class="text-sm font-bold text-slate-400">
+                    Casos bajo revisión
+                  </p>
+                  <p
+                    id="revission-Ia"
+                    class="mt-3 text-3xl font-black text-white"
+                  >
+                    0
+                  </p>
+                  <p class="mt-2 text-sm text-rose-300">
+                    Posible uso indebido de IA
+                  </p>
+                </div>
+
+                <div
+                  class="rounded-3xl border border-white/10 bg-slate-900/80 p-4 transform transition-all duration-500 hover:bg-slate-600/80 hover:scale-110"
+                >
+                  <p class="text-sm font-bold text-slate-400">
+                    Preguntas de defensa generadas
+                  </p>
+                  <p
+                    id="preguntas-Ia"
+                    class="mt-3 text-3xl font-black text-white"
+                  >
+                    0
+                  </p>
+                  <p class="mt-2 text-sm text-teal-300">Esta semana</p>
+                </div>
+              </div>
+
+              <div
+                class="mt-6 rounded-[1.75rem] border border-teal-400/al-40al-400/10 p-5 transform transition-all duration-500 hover:bg-teal-300/10 hover:translate-y-[-5px]"
+              >
+                <p class="text-sm font-black text-white">
+                  Asistente institucional
+                </p>
+                <p class="mt-3 text-sm leading-7 text-teal-100/80">
+                  La plataforma detecta dudas comunes, resume actividad en foros
+                  y ayuda a priorizar cursos o grupos que requieren seguimiento
+                  administrativo.
+                </p>
+              </div>
+            </article>
+          </section>
+
+          <section
+            id="prueba-chatbot"
+            class="mt-6 rounded-[2rem] border border-white/10 bg-white/5 p-5 shadow-2xl shadow-black/20 backdrop-blur-xl sm:p-6"
+          >
+            <div
+              class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between"
+            >
+              <div class="max-w-2xl">
+                <p
+                  class="text-xs font-extrabold uppercase tracking-[0.2em] text-amber-300"
+                >
+                  Validacion del chatbot
+                </p>
+                <h2 class="mt-2 text-2xl font-black text-white">
+                  Prueba el asistente como profesor o estudiante
+                </h2>
+                <p class="mt-3 text-sm leading-7 text-slate-400">
+                  El administrador puede cambiar el perfil de simulacion para
+                  revisar si el chatbot responde correctamente segun el tipo de
+                  usuario.
+                </p>
+              </div>
+
+              <div
+                class="rounded-3xl border border-teal-400/20 bg-teal-400/10 px-4 py-3 text-sm text-teal-100 transform transition-all duration-500 hover:bg-teal-400/20 hover:scale-110"
+              >
+                Modo actual:
+                <span id="chatbot-modo-actual" class="font-black"></span>
+              </div>
+            </div>
+
+            <div class="mt-6 grid gap-6 xl:grid-cols-[0.85fr_1.15fr]">
+              <aside class="space-y-4">
+                <div
+                  class="rounded-3xl border border-white/10 bg-slate-900/80 p-4"
+                >
+                  <label
+                    for="chatbot-modo"
+                    class="text-xs font-extrabold uppercase tracking-[0.18em] text-slate-400"
+                  >
+                    Probar como
+                  </label>
+                  <select
+                    id="chatbot-modo"
+                    class="mt-3 w-full rounded-2xl border border-white/10 bg-slate-900 px-4 py-3 text-sm font-semibold text-white outline-none transition focus:border-teal-300"
+                  >
+                    <option value="profesor">Profesor</option>
+                    <option value="estudiante">Estudiante</option>
+                  </select>
+                </div>
+
+                <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
+                  <button
+                    type="button"
+                    id="probar-chatbot-profesor"
+                    class="rounded-3xl border border-teal-400/20 bg-teal-400/10 p-4 text-left transform transition-all duration-500 hover:bg-teal-400/20 hover:translate-y-[-5px]"
+                  >
+                    <p class="text-sm font-black text-white">
+                      Simular profesor
+                    </p>
+                    <p class="mt-2 text-sm leading-6 text-teal-100/80">
+                      Valida respuestas sobre tareas, cursos, foros y apoyo
+                      docente.
+                    </p>
+                  </button>
+
+                  <button
+                    type="button"
+                    id="probar-chatbot-estudiante"
+                    class="rounded-3xl border border-amber-400/20 bg-amber-400/10 p-4 text-left transform transition-all duration-500 hover:bg-amber-400/20 hover:translate-y-[-5px]"
+                  >
+                    <p class="text-sm font-black text-white">
+                      Simular estudiante
+                    </p>
+                    <p class="mt-2 text-sm leading-6 text-amber-100/80">
+                      Revisa consultas sobre clases, entregas, notas y mensajes.
+                    </p>
+                  </button>
+                </div>
+
+                <div
+                  class="rounded-3xl border border-white/10 bg-white/5 p-4 transform transition-all duration-500 hover:bg-white/15 hover:translate-y-[-5px]"
+                >
+                  <p class="text-sm font-bold text-white">
+                    Checklist de prueba
+                  </p>
+                  <ul class="mt-3 space-y-2 text-sm text-slate-400">
+                    <li>Responde segun el rol seleccionado.</li>
+                    <li>
+                      Muestra informacion coherente con permisos del usuario.
+                    </li>
+                    <li>No mezcla acciones de profesor con estudiante.</li>
+                  </ul>
+                </div>
+              </aside>
+
+              <div
+                class="rounded-[1.75rem] border border-white/10 bg-slate-950/70 p-4 sm:p-5"
+              >
+                <div class="flex items-center justify-between gap-4">
+                  <div>
+                    <p class="text-sm font-black text-white">
+                      Vista previa de conversacion
+                    </p>
+                    <p
+                      class="mt-1 text-xs uppercase tracking-[0.18em] text-slate-500"
+                    >
+                      Entorno de prueba
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    id="iniciar-prueba-chatbot"
+                    class="rounded-2xl border border-white/10 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-white transform transition-all duration-500 hover:bg-white/20 hover:scale-110"
+                  >
+                    Iniciar prueba
+                  </button>
+                </div>
+
+                <div class="mt-5 max-h-[300px] space-y-4 overflow-y-auto pr-1" id="chatbot-preview-mensajes">
+                  <div class="flex justify-end">
+                    <div
+                      class="max-w-xl rounded-3xl bg-teal-400/15 px-4 py-3 text-sm text-teal-50"
+                    >
+                      Hola, quiero probar el chatbot como profesor. Que ayudas
+                      me puedes dar hoy?
+                    </div>
+                  </div>
+
+                  <div class="flex justify-start">
+                    <div
+                      class="max-w-xl rounded-3xl border border-white/10 bg-white/5 px-4 py-3 text-sm leading-6 text-slate-200"
+                    >
+                      Puedo ayudarte a revisar tareas pendientes, resumir dudas
+                      del curso, proponer preguntas de defensa y organizar
+                      recordatorios academicos.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mt-5 flex flex-col gap-3 sm:flex-row">
+                  <input
+                    id="chatbot-prueba-input"
+                    type="text"
+                    placeholder="Escribe una pregunta de prueba para el chatbot"
+                    class="flex-1 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500 focus:border-teal-300"
+                  />
+                  <button
+                    type="submit"
+                    id="enviar-prueba-chatbot"
+                    class="rounded-2xl bg-white px-5 py-3 text-sm font-black text-slate-950 transform transition-all duration-500 hover:bg-white/80 hover:scale-110"
+                  >
+                    Enviar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="actividad" class="mt-6 grid gap-6 xl:grid-cols-[1fr_1fr_1fr]">
+            <article class="rounded-[2rem] border border-white/10 bg-white/5 p-5 shadow-2xl shadow-black/20 backdrop-blur-xl sm:p-6">
+              <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-sky-300">Notificaciones</p>
+              <h2 class="mt-2 text-2xl font-black text-white">Avisos recientes</h2>
+              <div id="admin-notifications-list" class="mt-6 space-y-3"></div>
+            </article>
+
+            <article class="rounded-[2rem] border border-white/10 bg-white/5 p-5 shadow-2xl shadow-black/20 backdrop-blur-xl sm:p-6">
+              <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-amber-300">Historial</p>
+              <h2 class="mt-2 text-2xl font-black text-white">Registro general</h2>
+              <div id="admin-history-list" class="mt-6 space-y-3"></div>
+            </article>
+
+            <article class="rounded-[2rem] border border-white/10 bg-white/5 p-5 shadow-2xl shadow-black/20 backdrop-blur-xl sm:p-6">
+              <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-teal-300">Calendario</p>
+              <h2 class="mt-2 text-2xl font-black text-white">Próximas entregas</h2>
+              <div id="admin-calendar-list" class="mt-6 space-y-3"></div>
+            </article>
+          </section>
+        </main>
+      </div>
+    </div>
+    <section
+      id="teacher-create-modal"
+      class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 px-4 py-8 backdrop-blur-sm"
+      aria-hidden="true"
+    >
+      <div class="absolute inset-0" data-modal-close></div>
+      <article
+        class="relative w-full max-w-2xl rounded-[2rem] border border-white/10 bg-slate-950 p-6 shadow-2xl shadow-black/50 sm:p-8"
+      >
+        <div class="flex items-start justify-between gap-6">
+          <div>
+            <p
+              id="user-create-eyebrow"
+              class="text-xs font-extrabold uppercase tracking-[0.22em] text-teal-300"
+            >
+              Alta de profesor
+            </p>
+            <h2
+              id="user-create-title"
+              class="mt-3 text-3xl font-black tracking-tight text-white"
+            >
+              Crear nuevo profesor
+            </h2>
+            <p
+              id="user-create-description"
+              class="mt-3 text-sm leading-7 text-slate-400"
+            >
+              Ingresa los datos del profesor para que quede disponible en el
+              sistema y pueda iniciar sesion despues.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            class="rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-bold text-slate-200 transition hover:bg-white/10"
+            data-modal-close
+          >
+            Cerrar
+          </button>
+        </div>
+
+        <form id="teacher-create-form" class="mt-8 grid gap-5">
+          <div>
+            <label for="teacher-create-name" class="text-sm font-bold text-slate-200">
+              Nombre completo
+            </label>
+            <input
+              id="teacher-create-name"
+              type="text"
+              placeholder="Ej. Maria Lopez"
+              class="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500 focus:border-teal-300"
+            />
+          </div>
+
+          <div class="grid gap-5 sm:grid-cols-2">
+            <div>
+              <label for="teacher-create-email" class="text-sm font-bold text-slate-200">
+                Correo electronico
+              </label>
+              <input
+                id="teacher-create-email"
+                type="email"
+                placeholder="profesor@classmanager.com"
+                class="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500 focus:border-teal-300"
+              />
+            </div>
+
+            <div>
+              <label for="teacher-create-password" class="text-sm font-bold text-slate-200">
+                Contrasena temporal
+              </label>
+              <input
+                id="teacher-create-password"
+                type="password"
+                placeholder="Ingresa una clave"
+                class="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500 focus:border-teal-300"
+              />
+            </div>
+          </div>
+
+          <div
+            id="user-create-helper"
+            class="rounded-2xl border border-teal-400/20 bg-teal-400/10 px-4 py-3 text-sm leading-7 text-teal-100"
+          >
+            El profesor se creara en el sistema frontend y quedara disponible en la lista de usuarios y en el selector de grados.
+          </div>
+
+          <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <button
+              type="button"
+              class="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/10"
+              data-modal-close
+            >
+              Cancelar
+            </button>
+            <button
+              id="user-create-submit"
+              type="submit"
+              class="rounded-2xl bg-teal-400 px-5 py-3 text-sm font-black text-slate-950 transition hover:bg-teal-300"
+            >
+              Guardar profesor
+            </button>
+          </div>
+        </form>
+      </article>
+    </section>
+    <section
+      id="classroom-edit-modal"
+      class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 px-4 py-8 backdrop-blur-sm"
+      aria-hidden="true"
+    >
+      <div class="absolute inset-0" data-modal-close></div>
+      <article
+        class="relative w-full max-w-3xl rounded-[2rem] border border-white/10 bg-slate-950 p-6 shadow-2xl shadow-black/50 sm:p-8"
+      >
+        <div class="flex items-start justify-between gap-6">
+          <div>
+            <p class="text-xs font-extrabold uppercase tracking-[0.22em] text-teal-300">
+              Gestion de grado
+            </p>
+            <h2
+              id="classroom-edit-title"
+              class="mt-3 text-3xl font-black tracking-tight text-white"
+            >
+              Editar grado
+            </h2>
+            <p class="mt-3 text-sm leading-7 text-slate-400">
+              Selecciona o quita estudiantes para actualizar este grado sin perder el resto de la informacion.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            class="rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-bold text-slate-200 transition hover:bg-white/10"
+            data-modal-close
+          >
+            Cerrar
+          </button>
+        </div>
+
+        <form id="classroom-edit-form" class="mt-8 grid gap-5">
+          <div
+            class="rounded-2xl border border-teal-400/20 bg-teal-400/10 px-4 py-3 text-sm leading-7 text-teal-100"
+          >
+            Marca los estudiantes que deben permanecer en el grado. Los que no queden seleccionados se quitaran de este curso.
+          </div>
+
+          <div class="grid gap-3 md:grid-cols-2" id="classroom-edit-students"></div>
+
+          <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <button
+              type="button"
+              class="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/10"
+              data-modal-close
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="rounded-2xl bg-teal-400 px-5 py-3 text-sm font-black text-slate-950 transition hover:bg-teal-300"
+            >
+              Guardar cambios
+            </button>
+          </div>
+        </form>
+      </article>
+    </section>
+    <style>
+      [data-tone="warning"] {
+        border-color: rgba(251, 191, 36, 0.22);
+        background: rgba(251, 191, 36, 0.1);
+        color: #fef3c7;
+      }
+      [data-tone="success"] {
+        border-color: rgba(52, 211, 153, 0.22);
+        background: rgba(52, 211, 153, 0.1);
+        color: #d1fae5;
+      }
+      [data-tone="error"] {
+        border-color: rgba(251, 113, 133, 0.22);
+        background: rgba(251, 113, 133, 0.1);
+        color: #ffe4e6;
+      }
+      [data-tone="forum"] {
+        border-color: rgba(125, 211, 252, 0.22);
+        background: rgba(125, 211, 252, 0.1);
+        color: #e0f2fe;
+      }
+      [data-tone="grade"] {
+        border-color: rgba(45, 212, 191, 0.22);
+        background: rgba(45, 212, 191, 0.1);
+        color: #ccfbf1;
+      }
+      [data-tone="info"] {
+        border-color: rgba(148, 163, 184, 0.22);
+        background: rgba(148, 163, 184, 0.1);
+        color: #e2e8f0;
+      }
+      .admin-user-status.is-inactive {
+        color: #fda4af;
+      }
+    </style>
+
+    <template id="admin-user-row-template">
+      <article class="flex min-w-[920px] items-center gap-6 px-4 py-4 text-sm text-slate-300">
+        <div class="w-[180px] min-w-0 border-r border-white/10 pr-6">
+          <p data-user-name class="truncate font-black text-white"></p>
+        </div>
+        <div class="w-[300px] min-w-0 border-r border-white/10 pr-6">
+          <p data-user-email class="truncate text-slate-300"></p>
+        </div>
+        <div class="w-[120px] border-r border-white/10 pr-6">
+          <p data-user-role class="font-semibold text-white"></p>
+        </div>
+        <div class="w-[120px] border-r border-white/10 pr-6">
+          <p data-user-status class="admin-user-status font-semibold text-teal-300"></p>
+        </div>
+        <div data-user-last-seen class="ml-auto w-[160px] text-right text-xs text-slate-500"></div>
+      </article>
+    </template>
+
+    <template id="admin-users-empty-template">
+      <div class="px-4 py-5 text-sm text-slate-400">
+        Aun no hay usuarios registrados en esta sesion local.
+      </div>
+    </template>
+
+    <template id="admin-student-checkbox-template">
+      <label class="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200">
+        <input type="checkbox" class="h-4 w-4 accent-teal-400" />
+        <span data-student-name class="min-w-0 truncate"></span>
+      </label>
+    </template>
+
+    <template id="admin-students-empty-template">
+      <div class="rounded-2xl border border-dashed border-white/15 bg-slate-900/40 px-4 py-4 text-sm text-slate-400">
+        No hay estudiantes conocidos todavia. Deben registrarse o iniciar sesion al menos una vez.
+      </div>
+    </template>
+
+    <template id="admin-edit-students-empty-template">
+      <div class="rounded-2xl border border-dashed border-white/15 bg-slate-900/40 px-4 py-4 text-sm text-slate-400">
+        No hay estudiantes registrados todavia.
+      </div>
+    </template>
+
+    <template id="admin-classroom-template">
+      <article class="rounded-3xl border border-white/10 bg-slate-900/70 p-4">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p data-grade class="text-lg font-black text-white"></p>
+            <p data-teacher class="mt-1 text-sm text-slate-400"></p>
+          </div>
+          <div class="flex flex-wrap items-center gap-3">
+            <div data-students-count class="rounded-2xl bg-teal-400 px-4 py-2 text-sm font-black text-slate-950"></div>
+            <button type="button" data-edit-classroom class="rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-bold text-white transition hover:bg-white/10">
+              Gestionar estudiantes
+            </button>
+          </div>
+        </div>
+        <p data-students-list class="mt-3 text-sm leading-6 text-slate-300"></p>
+      </article>
+    </template>
+
+    <template id="admin-classrooms-empty-template">
+      <article class="rounded-3xl border border-dashed border-white/15 bg-slate-900/40 p-5 text-center text-sm text-slate-400">
+        Aun no se han creado grados.
+      </article>
+    </template>
+
+    <template id="admin-highlighted-course-template">
+      <article class="rounded-3xl border border-white/10 bg-slate-900/70 p-4">
+        <div class="flex items-center justify-between gap-4">
+          <div>
+            <p data-grade class="text-sm font-black text-white"></p>
+            <p data-teacher class="mt-1 text-sm text-slate-400"></p>
+          </div>
+          <div data-students class="rounded-2xl bg-teal-400 px-4 py-2 text-sm font-black text-slate-950"></div>
+        </div>
+      </article>
+    </template>
+
+    <template id="admin-highlighted-course-empty-template">
+      <article class="rounded-3xl border border-dashed border-white/15 bg-slate-900/40 p-5 text-center text-sm text-slate-400">
+        Aun no hay grados creados para mostrar.
+      </article>
+    </template>
+
+    <template id="dashboard-notification-template">
+      <article class="rounded-2xl border p-3">
+        <p data-title class="text-sm font-black text-white"></p>
+        <p data-detail class="mt-1 text-xs leading-5 text-slate-300"></p>
+        <p data-date class="mt-2 text-[11px] uppercase tracking-[0.18em] text-slate-500"></p>
+      </article>
+    </template>
+
+    <template id="dashboard-notifications-empty-template">
+      <div class="rounded-2xl border border-dashed border-white/15 bg-slate-900/40 px-4 py-4 text-sm text-slate-400">
+        No hay notificaciones recientes.
+      </div>
+    </template>
+
+    <template id="dashboard-history-template">
+      <article class="flex items-center justify-between gap-4 rounded-2xl border bg-slate-950/70 px-3 py-3">
+        <div class="min-w-0 flex-1">
+          <p data-title class="text-sm font-black text-white"></p>
+          <p data-detail class="mt-1 text-xs leading-5 text-slate-400"></p>
+          <p data-date class="mt-2 text-[11px] uppercase tracking-[0.18em] text-slate-500"></p>
+        </div>
+        <div class="flex items-center">
+          <span data-label class="rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em]"></span>
+        </div>
+      </article>
+    </template>
+
+    <template id="dashboard-history-empty-template">
+      <div class="rounded-2xl border border-dashed border-white/15 bg-slate-900/40 px-4 py-4 text-sm text-slate-400">
+        No hay historial registrado.
+      </div>
+    </template>
+
+    <template id="admin-calendar-template">
+      <article class="rounded-2xl border border-teal-400/20 bg-slate-950/70 px-4 py-4 shadow-sm">
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0 flex-1">
+            <p data-title class="text-sm font-black text-white"></p>
+            <div data-grade class="mt-3 inline-flex rounded-full border border-teal-400/20 bg-teal-400/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-emerald-100"></div>
+          </div>
+          <div class="shrink-0 rounded-2xl border border-teal-400/20 bg-slate-950/70 px-3 py-2 text-right">
+            <p class="text-[10px] font-black uppercase tracking-[0.18em] text-teal-100/70">Fecha</p>
+            <p data-date class="mt-1 text-sm font-bold text-teal-50"></p>
+          </div>
+        </div>
+      </article>
+    </template>
+
+    <template id="admin-calendar-empty-template">
+      <div class="rounded-2xl border border-dashed border-white/15 bg-slate-900/40 px-4 py-4 text-sm text-slate-400">
+        No hay entregas proximas por mostrar.
+      </div>
+    </template>
+
+    <template id="admin-chatbot-user-template">
+      <div class="flex justify-end">
+        <div data-message class="max-w-xl rounded-3xl bg-teal-400/15 px-4 py-3 text-sm leading-6 text-teal-50"></div>
+      </div>
+    </template>
+
+    <template id="admin-chatbot-assistant-template">
+      <div class="flex justify-start">
+        <div data-message class="max-w-xl rounded-3xl border border-white/10 bg-white/5 px-4 py-3 text-sm leading-6 text-slate-200"></div>
+      </div>
+    </template>
+
+    <script src="./js/appState.js"></script>
+    <script src="./js/adminDashboard.js"></script>
+  </body>
+</html>
