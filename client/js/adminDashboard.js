@@ -32,6 +32,7 @@ const userCreateTitle = document.getElementById("user-create-title");
 const userCreateDescription = document.getElementById("user-create-description");
 const userCreateHelper = document.getElementById("user-create-helper");
 const userCreateSubmit = document.getElementById("user-create-submit");
+const userCreateFeedback = document.getElementById("user-create-feedback");
 const classroomEditModal = document.getElementById("classroom-edit-modal");
 const classroomEditForm = document.getElementById("classroom-edit-form");
 const classroomEditTitle = document.getElementById("classroom-edit-title");
@@ -59,6 +60,7 @@ let adminChatHistory = [];
 let adminChatLoading = false;
 let userCreateRole = "Profesor";
 let userActionInFlight = false;
+let remoteUsersCache = [];
 const DEFAULT_REMOTE_TIMEOUT_MS = 15000;
 
 const syncUserCreateModalCopy = () => {
@@ -87,6 +89,7 @@ const syncUserCreateModalCopy = () => {
 const openUserCreateModal = (role = "Profesor") => {
   userCreateRole = role === "Admin" ? "Admin" : "Profesor";
   syncUserCreateModalCopy();
+  clearUserCreateFeedback();
   openTeacherModal();
 };
 
@@ -189,8 +192,27 @@ const syncUsersFromDatabase = async () => {
   const localUsers = AdminApp.getUsers();
   const localAuthUsers = AdminApp.getAuthUsers();
   const users = await fetchRemoteUsers();
+  remoteUsersCache = users;
   AdminApp.replaceKnownUsers([...localUsers, ...localAuthUsers, ...users]);
   return users;
+};
+
+const showUserCreateFeedback = (message, type = "success") => {
+  if (!userCreateFeedback) return;
+
+  userCreateFeedback.textContent = message;
+  userCreateFeedback.className =
+    "rounded-2xl border px-4 py-3 text-sm font-bold " +
+    (type === "error"
+      ? "border-rose-400/30 bg-rose-400/10 text-rose-100"
+      : "border-teal-400/30 bg-teal-400/10 text-teal-100");
+  userCreateFeedback.classList.remove("hidden");
+};
+
+const clearUserCreateFeedback = () => {
+  if (!userCreateFeedback) return;
+  userCreateFeedback.textContent = "";
+  userCreateFeedback.classList.add("hidden");
 };
 
 const formatDate = (value) =>
@@ -362,7 +384,7 @@ const getVisibleAdminUsers = () => {
       }
     : null;
 
-  [sessionUser, ...AdminApp.getUsers(), ...AdminApp.getAuthUsers()]
+  [sessionUser, ...remoteUsersCache, ...AdminApp.getUsers(), ...AdminApp.getAuthUsers()]
     .filter(Boolean)
     .forEach((user) => {
     const email = String(user.email ?? "").trim().toLowerCase();
@@ -1105,7 +1127,23 @@ teacherCreateForm?.addEventListener("submit", async (event) => {
       password,
     });
     AdminApp.registerKnownUser(result.data);
-    await syncUsersFromDatabase();
+    remoteUsersCache = [
+      result.data,
+      ...remoteUsersCache.filter(
+        (user) =>
+          String(user._id ?? user.id ?? "") !== String(result.data?._id ?? result.data?.id ?? "") &&
+          String(user.email ?? "").trim().toLowerCase() !== email,
+      ),
+    ];
+    syncUsersFromDatabase()
+      .then(() => {
+        renderUsers();
+        populateClassroomForm();
+        renderSummary();
+      })
+      .catch((syncError) => {
+        console.warn("Usuario creado, pero no se pudo refrescar desde Mongo:", syncError.message);
+      });
     createdRemotely = true;
   } catch (error) {
     createLocalAdminManagedUser({
@@ -1127,8 +1165,11 @@ teacherCreateForm?.addEventListener("submit", async (event) => {
   renderSummary();
   renderAdminPanels();
   closeTeacherModal();
+  showUserCreateFeedback(
+    `${createdRole === "Admin" ? "Administrador" : "Profesor"} creado exitosamente.`,
+  );
   alert(
-    `${createdRole === "Admin" ? "Administrador" : "Profesor"} creado correctamente${
+    `${createdRole === "Admin" ? "Administrador" : "Profesor"} creado exitosamente${
       createdRemotely ? " y guardado en la base de datos." : " en esta sesion local."
     }`,
   );
@@ -1204,6 +1245,12 @@ chatbotPreviewInput?.addEventListener("keydown", (event) => {
 });
 
 const initializeAdminDashboard = async () => {
+  renderUsers();
+  populateClassroomForm();
+  renderClassrooms();
+  renderSummary();
+  renderAdminPanels();
+
   try {
     await syncUsersFromDatabase();
   } catch (error) {
