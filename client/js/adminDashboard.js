@@ -265,6 +265,7 @@ const openTeacherModal = () => {
   if (!teacherCreateModal) return;
 
   teacherCreateModal.style.display = "";
+  teacherCreateModal.scrollTop = 0;
   openModal(teacherCreateModal);
   teacherCreateNameInput?.focus();
 };
@@ -332,7 +333,23 @@ const closeClassroomEditModal = () => {
 };
 
 const renderUsers = () => {
-  const users = AdminApp.getUsers();
+  adminSession = AdminApp.syncStoredSession() || adminSession;
+  const currentSessionId = String(adminSession?.user?.id ?? "");
+  const currentSessionEmail = String(adminSession?.user?.email ?? "")
+    .trim()
+    .toLowerCase();
+  const users = AdminApp.getUsers().sort((a, b) => {
+    const aIsCurrent =
+      String(a.id) === currentSessionId ||
+      String(a.email ?? "").trim().toLowerCase() === currentSessionEmail;
+    const bIsCurrent =
+      String(b.id) === currentSessionId ||
+      String(b.email ?? "").trim().toLowerCase() === currentSessionEmail;
+
+    if (aIsCurrent && !bIsCurrent) return -1;
+    if (!aIsCurrent && bIsCurrent) return 1;
+    return 0;
+  });
   usersList.innerHTML = "";
 
   if (!users.length) {
@@ -345,14 +362,23 @@ const renderUsers = () => {
   }
 
   users.forEach((user) => {
-    const isCurrentUser = String(user.id) === String(adminSession?.user?.id);
+    const isCurrentUser =
+      String(user.id) === currentSessionId ||
+      String(user.email ?? "").trim().toLowerCase() === currentSessionEmail;
     const nextState = user.estado === false;
     const row = document.createElement("article");
     row.className =
       "flex min-w-[1160px] items-center gap-6 px-4 py-4 text-sm text-slate-300";
     row.innerHTML = `
       <div class="w-[180px] min-w-0 border-r border-white/10 pr-6">
-        <p class="truncate font-black text-white">${user.name}</p>
+        <div class="flex min-w-0 flex-wrap items-center gap-2">
+          <p class="truncate font-black text-white">${user.name}</p>
+          ${
+            isCurrentUser
+              ? '<span class="rounded-full border border-teal-400/30 bg-teal-400/10 px-2 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-teal-100">Sesion actual</span>'
+              : ""
+          }
+        </div>
       </div>
       <div class="w-[300px] min-w-0 border-r border-white/10 pr-6">
         <p class="truncate text-slate-300">${user.email}</p>
@@ -369,29 +395,31 @@ const renderUsers = () => {
         ${new Date(user.lastSeenAt || Date.now()).toLocaleDateString("es-CO")}
       </div>
       <div class="w-[220px] shrink-0 text-right">
-        <div class="flex flex-wrap justify-end gap-2">
-          <button
-            type="button"
-            class="${
-              nextState
-                ? "border-teal-400/30 bg-teal-400/10 text-teal-100 hover:bg-teal-400/20"
-                : "border-amber-400/30 bg-amber-400/10 text-amber-100 hover:bg-amber-400/20"
-            } rounded-2xl border px-3 py-2 text-xs font-black transition disabled:cursor-not-allowed disabled:opacity-40"
-            data-toggle-user-status="${user.id}"
-            data-next-state="${String(nextState)}"
-            ${isCurrentUser && !nextState ? "disabled" : ""}
-          >
-            ${nextState ? "Activar" : "Desactivar"}
-          </button>
-          <button
-            type="button"
-            class="rounded-2xl border border-rose-400/30 bg-rose-400/10 px-3 py-2 text-xs font-black text-rose-100 transition hover:bg-rose-400/20 disabled:cursor-not-allowed disabled:opacity-40"
-            data-delete-user="${user.id}"
-            ${isCurrentUser ? "disabled" : ""}
-          >
-            Eliminar
-          </button>
-        </div>
+        ${
+          isCurrentUser
+            ? '<span class="inline-flex rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-black text-slate-300">Cuenta protegida</span>'
+            : `<div class="flex flex-wrap justify-end gap-2">
+                <button
+                  type="button"
+                  class="${
+                    nextState
+                      ? "border-teal-400/30 bg-teal-400/10 text-teal-100 hover:bg-teal-400/20"
+                      : "border-amber-400/30 bg-amber-400/10 text-amber-100 hover:bg-amber-400/20"
+                  } rounded-2xl border px-3 py-2 text-xs font-black transition"
+                  data-toggle-user-status="${user.id}"
+                  data-next-state="${String(nextState)}"
+                >
+                  ${nextState ? "Activar" : "Desactivar"}
+                </button>
+                <button
+                  type="button"
+                  class="rounded-2xl border border-rose-400/30 bg-rose-400/10 px-3 py-2 text-xs font-black text-rose-100 transition hover:bg-rose-400/20"
+                  data-delete-user="${user.id}"
+                >
+                  Eliminar
+                </button>
+              </div>`
+        }
       </div>
     `;
     usersList.appendChild(row);
