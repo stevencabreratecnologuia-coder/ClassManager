@@ -1091,6 +1091,7 @@
     getSession,
     setSession,
     clearSession,
+    syncStoredSession,
     getCurrentUser,
     getUsers,
     replaceKnownUsers,
