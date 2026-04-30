@@ -355,21 +355,39 @@ const getVisibleAdminUsers = () => {
     .trim()
     .toLowerCase();
   const mergedUsers = [];
-  [...AdminApp.getUsers(), ...AdminApp.getAuthUsers()].forEach((user) => {
+  const sessionUser = adminSession?.user
+    ? {
+        ...adminSession.user,
+        estado: adminSession.user.estado ?? true,
+      }
+    : null;
+
+  [sessionUser, ...AdminApp.getUsers(), ...AdminApp.getAuthUsers()]
+    .filter(Boolean)
+    .forEach((user) => {
     const email = String(user.email ?? "").trim().toLowerCase();
+    const normalizedUser = {
+      ...user,
+      id: String(user.id ?? user._id ?? ""),
+      name: user.name || "Sin nombre",
+      email,
+      rol: user.rol || "Estudiante",
+      estado: user.estado ?? true,
+      lastSeenAt: user.lastSeenAt || new Date().toISOString(),
+    };
     const existingIndex = mergedUsers.findIndex(
       (item) =>
-        String(item.id) === String(user.id) ||
+        (normalizedUser.id && String(item.id) === normalizedUser.id) ||
         (email && String(item.email ?? "").trim().toLowerCase() === email),
     );
 
     if (existingIndex >= 0) {
       mergedUsers[existingIndex] = {
         ...mergedUsers[existingIndex],
-        ...user,
+        ...normalizedUser,
       };
     } else {
-      mergedUsers.push(user);
+      mergedUsers.push(normalizedUser);
     }
   });
 
@@ -388,6 +406,8 @@ const getVisibleAdminUsers = () => {
 };
 
 const renderUsers = () => {
+  if (!usersList) return;
+
   const users = getVisibleAdminUsers();
   const currentSessionId = String(adminSession?.user?.id ?? "");
   const currentSessionEmail = String(adminSession?.user?.email ?? "")
@@ -397,8 +417,8 @@ const renderUsers = () => {
 
   if (!users.length) {
     usersList.innerHTML = `
-      <div class="px-4 py-5 text-sm text-slate-400">
-        Aun no hay usuarios registrados en esta sesion local.
+      <div class="min-w-[1160px] px-4 py-5 text-sm text-slate-400">
+        No hay usuarios para mostrar todavia. Crea un profesor o administrador para llenar esta lista.
       </div>
     `;
     return;
@@ -511,6 +531,25 @@ const exportUsersExcel = () => {
     headers,
     rows,
   );
+};
+
+const userExistsInVisibleList = (email) => {
+  const normalizedEmail = String(email ?? "").trim().toLowerCase();
+  return getVisibleAdminUsers().some(
+    (user) => String(user.email ?? "").trim().toLowerCase() === normalizedEmail,
+  );
+};
+
+const createLocalAdminManagedUser = ({ name, email, password, rol }) => {
+  const { publicUser } = AdminApp.createLocalAccount({
+    name,
+    email,
+    password,
+    rol,
+    estado: true,
+  });
+
+  return publicUser;
 };
 
 const renderNotifications = () => {
@@ -1020,15 +1059,13 @@ teacherCreateForm?.addEventListener("submit", async (event) => {
     return;
   }
 
-  const alreadyExists = AdminApp.getAuthUsers().some(
-    (user) => user.email === email,
-  );
-  if (alreadyExists) {
+  if (userExistsInVisibleList(email)) {
     alert("Ese correo ya existe. Usa otro para el usuario.");
     return;
   }
 
   const createdRole = userCreateRole;
+  let createdRemotely = false;
 
   try {
     const remoteSession = await ensureRemoteAdminSession();
@@ -1051,7 +1088,14 @@ teacherCreateForm?.addEventListener("submit", async (event) => {
       DEFAULT_REMOTE_TIMEOUT_MS,
     );
 
-    const result = await response.json();
+    const rawText = await response.text();
+    let result = {};
+    try {
+      result = rawText ? JSON.parse(rawText) : {};
+    } catch {
+      result = {};
+    }
+
     if (!response.ok || result.status !== "success") {
       throw new Error(result.message || "No fue posible guardar el usuario en la base de datos.");
     }
@@ -1062,15 +1106,20 @@ teacherCreateForm?.addEventListener("submit", async (event) => {
     });
     AdminApp.registerKnownUser(result.data);
     await syncUsersFromDatabase();
+    createdRemotely = true;
   } catch (error) {
-    if (error?.name === "AbortError") {
-      alert(
-        "El servidor tardo demasiado en responder. Si estas en Render, espera unos segundos y vuelve a intentarlo.",
-      );
-      return;
-    }
-    alert(error.message || "No fue posible guardar el usuario en la base de datos.");
-    return;
+    createLocalAdminManagedUser({
+      name,
+      email,
+      password,
+      rol: createdRole,
+    });
+
+    const remoteMessage =
+      error?.name === "AbortError"
+        ? "El servidor tardo demasiado en responder."
+        : error.message || "No fue posible guardar en la base de datos.";
+    console.warn("Usuario guardado localmente:", remoteMessage);
   }
 
   populateClassroomForm();
@@ -1079,9 +1128,9 @@ teacherCreateForm?.addEventListener("submit", async (event) => {
   renderAdminPanels();
   closeTeacherModal();
   alert(
-    createdRole === "Admin"
-      ? "Administrador creado correctamente y guardado en la base de datos."
-      : "Profesor creado correctamente y guardado en la base de datos.",
+    `${createdRole === "Admin" ? "Administrador" : "Profesor"} creado correctamente${
+      createdRemotely ? " y guardado en la base de datos." : " en esta sesion local."
+    }`,
   );
 });
 
