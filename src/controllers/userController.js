@@ -34,7 +34,7 @@ export const createUser = async (req, res, next) => {
 
 export const updateUser = async (req, res, next) => {
   try {
-    const user = await updateUserRecord(req.params.id, req.body);
+    const user = await updateUserRecord(req.params.id, req.body, req.user.id);
 
     res.status(200).json({
       status: "success",

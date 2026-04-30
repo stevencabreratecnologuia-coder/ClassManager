@@ -264,21 +264,15 @@ const closeModal = (modal) => {
 const openTeacherModal = () => {
   if (!teacherCreateModal) return;
 
-  teacherCreateModal.style.display = "flex";
-  teacherCreateModal.style.position = "fixed";
-  teacherCreateModal.style.inset = "0";
-  teacherCreateModal.style.alignItems = "center";
-  teacherCreateModal.style.justifyContent = "center";
-  teacherCreateModal.style.zIndex = "9999";
-  teacherCreateModal.style.padding = "1rem";
-
-  teacherCreateModal?.classList.remove("hidden");
-  teacherCreateModal?.classList.add("flex");
-  teacherCreateModal?.setAttribute("aria-hidden", "false");
+  teacherCreateModal.style.display = "";
+  openModal(teacherCreateModal);
   teacherCreateNameInput?.focus();
 };
 
 const closeTeacherModal = () => {
+  if (teacherCreateModal) {
+    teacherCreateModal.style.display = "";
+  }
   closeModal(teacherCreateModal);
   teacherCreateForm?.reset();
   userCreateRole = "Profesor";
@@ -351,9 +345,11 @@ const renderUsers = () => {
   }
 
   users.forEach((user) => {
+    const isCurrentUser = String(user.id) === String(adminSession?.user?.id);
+    const nextState = user.estado === false;
     const row = document.createElement("article");
     row.className =
-      "flex min-w-[920px] items-center gap-6 px-4 py-4 text-sm text-slate-300";
+      "flex min-w-[1160px] items-center gap-6 px-4 py-4 text-sm text-slate-300";
     row.innerHTML = `
       <div class="w-[180px] min-w-0 border-r border-white/10 pr-6">
         <p class="truncate font-black text-white">${user.name}</p>
@@ -372,8 +368,48 @@ const renderUsers = () => {
       <div class="ml-auto w-[160px] text-right text-xs text-slate-500">
         ${new Date(user.lastSeenAt || Date.now()).toLocaleDateString("es-CO")}
       </div>
+      <div class="w-[220px] shrink-0 text-right">
+        <div class="flex flex-wrap justify-end gap-2">
+          <button
+            type="button"
+            class="${
+              nextState
+                ? "border-teal-400/30 bg-teal-400/10 text-teal-100 hover:bg-teal-400/20"
+                : "border-amber-400/30 bg-amber-400/10 text-amber-100 hover:bg-amber-400/20"
+            } rounded-2xl border px-3 py-2 text-xs font-black transition disabled:cursor-not-allowed disabled:opacity-40"
+            data-toggle-user-status="${user.id}"
+            data-next-state="${String(nextState)}"
+            ${isCurrentUser && !nextState ? "disabled" : ""}
+          >
+            ${nextState ? "Activar" : "Desactivar"}
+          </button>
+          <button
+            type="button"
+            class="rounded-2xl border border-rose-400/30 bg-rose-400/10 px-3 py-2 text-xs font-black text-rose-100 transition hover:bg-rose-400/20 disabled:cursor-not-allowed disabled:opacity-40"
+            data-delete-user="${user.id}"
+            ${isCurrentUser ? "disabled" : ""}
+          >
+            Eliminar
+          </button>
+        </div>
+      </div>
     `;
     usersList.appendChild(row);
+  });
+
+  usersList.querySelectorAll("[data-toggle-user-status]").forEach((button) => {
+    button.addEventListener("click", () => {
+      toggleUserStatus(
+        button.dataset.toggleUserStatus,
+        button.dataset.nextState === "true",
+      );
+    });
+  });
+
+  usersList.querySelectorAll("[data-delete-user]").forEach((button) => {
+    button.addEventListener("click", () => {
+      deleteUserAccount(button.dataset.deleteUser);
+    });
   });
 };
 
@@ -701,6 +737,11 @@ const toggleUserStatus = async (userId, nextState) => {
   }
 
   const actionLabel = nextState ? "activar" : "desactivar";
+  if (!nextState && String(targetUser.id) === String(adminSession?.user?.id)) {
+    alert("No puedes desactivar tu propio usuario admin.");
+    return;
+  }
+
   if (!window.confirm(`Quieres ${actionLabel} a ${targetUser.name}?`)) {
     return;
   }

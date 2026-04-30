@@ -77,7 +77,12 @@ export const createUserRecord = async ({
 export const updateUserRecord = async (
   id,
   { name, email, password, rol, estado },
+  currentUserId,
 ) => {
+  if (estado === false && String(currentUserId) === String(id)) {
+    throw createHttpError(400, "No puedes desactivar tu propio usuario");
+  }
+
   const updateData = {};
   if (name) updateData.name = String(name).trim();
   if (email) {
