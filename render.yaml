@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: classmanager
+    runtime: node
+    plan: free
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 22
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_NAME
+        value: Admin Principal
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: MONGO_DNS_SERVERS
+        value: 8.8.8.8,1.1.1.1
+      - key: OPENAI_MODEL
+        value: gpt-4o-mini

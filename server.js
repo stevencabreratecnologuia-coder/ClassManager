@@ -11,7 +11,7 @@ import { connectDB } from "./src/config/db.js";
 import { errorHandler } from "./src/middlewares/errorMiddleware.js";
 import { createOrSyncAdmin } from "./src/services/authService.js";
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -19,14 +19,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const clientPath = path.join(__dirname, "client");
 
-if (process.env.MONGO_URI || process.env.MONGO_DIRECT_URI) {
-  const dbConnected = await connectDB();
-  if (dbConnected) {
-    await createOrSyncAdmin();
-  }
+const dbConnected = await connectDB();
+if (dbConnected) {
+  await createOrSyncAdmin();
 } else {
   console.warn(
-    "MONGO_URI no esta configurado. El frontend cargara, pero login y registro no podran autenticarse.",
+    "MongoDB no esta conectado. El frontend cargara, pero login y registro no podran autenticarse.",
   );
 }
 

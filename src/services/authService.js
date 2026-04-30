@@ -82,15 +82,22 @@ export const registerUser = async ({ name, email, password }) => {
 };
 
 export const createOrSyncAdmin = async () => {
-  const email = normalizeEmail(process.env.ADMIN_EMAIL || "admin@test.com");
-  const password = String(process.env.ADMIN_PASSWORD || "password123").trim();
-  const name = normalizeText(process.env.ADMIN_NAME || "Admin de Prueba");
+  const isProduction = process.env.NODE_ENV === "production";
+  const email = normalizeEmail(
+    process.env.ADMIN_EMAIL || (isProduction ? "" : "admin@test.com"),
+  );
+  const password = String(
+    process.env.ADMIN_PASSWORD || (isProduction ? "" : "password123"),
+  ).trim();
+  const name = normalizeText(
+    process.env.ADMIN_NAME || (isProduction ? "" : "Admin de Prueba"),
+  );
 
   if (!email || !password || !name) {
     console.warn(
       "No se pudo preparar el admin inicial porque faltan ADMIN_NAME, ADMIN_EMAIL o ADMIN_PASSWORD.",
     );
-    return;
+    return null;
   }
 
   const existingUser = await findUserByEmail(email);
@@ -105,7 +112,7 @@ export const createOrSyncAdmin = async () => {
       estado: true,
     });
     console.log(`Admin inicial creado: ${email}`);
-    return;
+    return await findUserByEmail(email);
   }
 
   let shouldSave = false;
@@ -139,10 +146,11 @@ export const createOrSyncAdmin = async () => {
   if (shouldSave) {
     await existingUser.save();
     console.log(`Admin inicial actualizado: ${email}`);
-    return;
+    return existingUser;
   }
 
   console.log(`Admin inicial listo: ${email}`);
+  return existingUser;
 };
 
 export const loginUser = async ({ email, password }) => {
