@@ -186,8 +186,10 @@ const fetchRemoteUsers = async () => {
 };
 
 const syncUsersFromDatabase = async () => {
+  const localUsers = AdminApp.getUsers();
+  const localAuthUsers = AdminApp.getAuthUsers();
   const users = await fetchRemoteUsers();
-  AdminApp.replaceKnownUsers(users);
+  AdminApp.replaceKnownUsers([...localUsers, ...localAuthUsers, ...users]);
   return users;
 };
 
@@ -264,16 +266,30 @@ const closeModal = (modal) => {
 const openTeacherModal = () => {
   if (!teacherCreateModal) return;
 
-  teacherCreateModal.style.display = "";
+  teacherCreateModal.style.display = "flex";
+  teacherCreateModal.style.position = "fixed";
+  teacherCreateModal.style.top = "0";
+  teacherCreateModal.style.right = "0";
+  teacherCreateModal.style.bottom = "0";
+  teacherCreateModal.style.left = "0";
+  teacherCreateModal.style.zIndex = "9999";
+  teacherCreateModal.style.alignItems = "center";
+  teacherCreateModal.style.justifyContent = "center";
+  teacherCreateModal.style.padding = "1rem";
+  teacherCreateModal.style.overflowY = "auto";
   teacherCreateModal.scrollTop = 0;
-  openModal(teacherCreateModal);
+  document.body.style.overflow = "hidden";
+  teacherCreateModal.classList.remove("hidden");
+  teacherCreateModal.classList.add("flex");
+  teacherCreateModal.setAttribute("aria-hidden", "false");
   teacherCreateNameInput?.focus();
 };
 
 const closeTeacherModal = () => {
   if (teacherCreateModal) {
-    teacherCreateModal.style.display = "";
+    teacherCreateModal.style.display = "none";
   }
+  document.body.style.overflow = "";
   closeModal(teacherCreateModal);
   teacherCreateForm?.reset();
   userCreateRole = "Profesor";
@@ -332,13 +348,32 @@ const closeClassroomEditModal = () => {
   classroomEditForm?.reset();
 };
 
-const renderUsers = () => {
+const getVisibleAdminUsers = () => {
   adminSession = AdminApp.syncStoredSession() || adminSession;
   const currentSessionId = String(adminSession?.user?.id ?? "");
   const currentSessionEmail = String(adminSession?.user?.email ?? "")
     .trim()
     .toLowerCase();
-  const users = AdminApp.getUsers().sort((a, b) => {
+  const mergedUsers = [];
+  [...AdminApp.getUsers(), ...AdminApp.getAuthUsers()].forEach((user) => {
+    const email = String(user.email ?? "").trim().toLowerCase();
+    const existingIndex = mergedUsers.findIndex(
+      (item) =>
+        String(item.id) === String(user.id) ||
+        (email && String(item.email ?? "").trim().toLowerCase() === email),
+    );
+
+    if (existingIndex >= 0) {
+      mergedUsers[existingIndex] = {
+        ...mergedUsers[existingIndex],
+        ...user,
+      };
+    } else {
+      mergedUsers.push(user);
+    }
+  });
+
+  return mergedUsers.sort((a, b) => {
     const aIsCurrent =
       String(a.id) === currentSessionId ||
       String(a.email ?? "").trim().toLowerCase() === currentSessionEmail;
@@ -350,6 +385,14 @@ const renderUsers = () => {
     if (!aIsCurrent && bIsCurrent) return 1;
     return 0;
   });
+};
+
+const renderUsers = () => {
+  const users = getVisibleAdminUsers();
+  const currentSessionId = String(adminSession?.user?.id ?? "");
+  const currentSessionEmail = String(adminSession?.user?.email ?? "")
+    .trim()
+    .toLowerCase();
   usersList.innerHTML = "";
 
   if (!users.length) {
@@ -439,6 +482,35 @@ const renderUsers = () => {
       deleteUserAccount(button.dataset.deleteUser);
     });
   });
+};
+
+const exportUsersExcel = () => {
+  const users = getVisibleAdminUsers();
+  const headers = ["Nombre", "Correo", "Rol", "Estado", "Sesion actual"];
+  const currentSessionId = String(adminSession?.user?.id ?? "");
+  const currentSessionEmail = String(adminSession?.user?.email ?? "")
+    .trim()
+    .toLowerCase();
+  const rows = users.map((user) => {
+    const isCurrentUser =
+      String(user.id) === currentSessionId ||
+      String(user.email ?? "").trim().toLowerCase() === currentSessionEmail;
+
+    return [
+      user.name || "Sin nombre",
+      user.email || "",
+      user.rol || "",
+      user.estado === false ? "Inactivo" : "Activo",
+      isCurrentUser ? "Si" : "No",
+    ];
+  });
+
+  AdminApp.downloadExcel(
+    "usuarios-classmanager.xls",
+    "Usuarios",
+    headers,
+    rows,
+  );
 };
 
 const renderNotifications = () => {
@@ -1051,6 +1123,8 @@ document.getElementById("export-report")?.addEventListener("click", () => {
     rows,
   );
 });
+
+document.getElementById("export-csv")?.addEventListener("click", exportUsersExcel);
 
 chatbotModeSelect?.addEventListener("change", () => {
   syncAdminChatMode(chatbotModeSelect.value);
