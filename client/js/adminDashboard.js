@@ -439,7 +439,7 @@ const renderUsers = () => {
 
   if (!users.length) {
     usersList.innerHTML = `
-      <div class="min-w-[1160px] px-4 py-5 text-sm text-slate-400">
+      <div class="admin-users-empty min-w-[1160px] px-4 py-5 text-sm text-slate-400">
         No hay usuarios para mostrar todavia. Crea un profesor o administrador para llenar esta lista.
       </div>
     `;
@@ -453,9 +453,9 @@ const renderUsers = () => {
     const nextState = user.estado === false;
     const row = document.createElement("article");
     row.className =
-      "flex min-w-[1160px] items-center gap-6 px-4 py-4 text-sm text-slate-300";
+      "admin-users-row flex min-w-[1160px] items-center gap-6 px-4 py-4 text-sm text-slate-300";
     row.innerHTML = `
-      <div class="w-[180px] min-w-0 border-r border-white/10 pr-6">
+      <div class="w-[180px] min-w-0 border-r border-white/10 pr-6" data-label="Nombre">
         <div class="flex min-w-0 flex-wrap items-center gap-2">
           <p class="truncate font-black text-white">${user.name}</p>
           ${
@@ -465,21 +465,21 @@ const renderUsers = () => {
           }
         </div>
       </div>
-      <div class="w-[300px] min-w-0 border-r border-white/10 pr-6">
+      <div class="w-[300px] min-w-0 border-r border-white/10 pr-6" data-label="Correo">
         <p class="truncate text-slate-300">${user.email}</p>
       </div>
-      <div class="w-[120px] border-r border-white/10 pr-6">
+      <div class="w-[120px] border-r border-white/10 pr-6" data-label="Rol">
         <p class="font-semibold text-white">${user.rol}</p>
       </div>
-      <div class="w-[120px] border-r border-white/10 pr-6">
+      <div class="w-[120px] border-r border-white/10 pr-6" data-label="Estado">
         <p class="${user.estado ? "text-teal-300" : "text-rose-300"} font-semibold">${
       user.estado ? "Activo" : "Inactivo"
     }</p>
       </div>
-      <div class="ml-auto w-[160px] text-right text-xs text-slate-500">
+      <div class="ml-auto w-[160px] text-right text-xs text-slate-500" data-label="Ultimo acceso">
         ${new Date(user.lastSeenAt || Date.now()).toLocaleDateString("es-CO")}
       </div>
-      <div class="w-[220px] shrink-0 text-right">
+      <div class="admin-users-actions w-[220px] shrink-0 text-right" data-label="Acciones">
         ${
           isCurrentUser
             ? '<span class="inline-flex rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-black text-slate-300">Cuenta protegida</span>'

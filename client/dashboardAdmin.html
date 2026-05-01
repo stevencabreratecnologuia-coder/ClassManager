@@ -302,7 +302,8 @@
                 class="mt-6 overflow-hidden rounded-[1.5rem] border border-white/10"
               >
               <div
-                  class="flex min-w-[1160px] items-center gap-6 bg-white/5 px-4 py-3 text-xs font-extrabold uppercase tracking-[0.18em] text-slate-400"
+                  id="usuarios-header-row"
+                  class="admin-users-header flex min-w-[1160px] items-center gap-6 bg-white/5 px-4 py-3 text-xs font-extrabold uppercase tracking-[0.18em] text-slate-400"
                 >
                   <div class="w-[180px] border-r border-white/10 pr-6" id="name">
                     Nombre
@@ -931,6 +932,69 @@
       .admin-user-status.is-inactive {
         color: #fda4af;
       }
+
+      /* ---------- Responsive: tablet y celular ---------- */
+      @media (max-width: 1023px) {
+        /* Lista de usuarios: de tabla a tarjetas */
+        .admin-users-header {
+          display: none !important;
+        }
+        #usuarios-lista {
+          overflow-x: visible !important;
+        }
+        #usuarios-lista > article.admin-users-row {
+          display: grid !important;
+          grid-template-columns: 1fr;
+          min-width: 0 !important;
+          gap: 0.5rem !important;
+          padding: 1rem !important;
+        }
+        #usuarios-lista > article.admin-users-row > div {
+          width: 100% !important;
+          min-width: 0 !important;
+          border-right: 0 !important;
+          padding-right: 0 !important;
+          text-align: left !important;
+          margin-left: 0 !important;
+        }
+        #usuarios-lista > article.admin-users-row > div[data-label]::before {
+          content: attr(data-label);
+          display: block;
+          font-size: 10px;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          font-weight: 800;
+          color: rgb(148 163 184);
+          margin-bottom: 2px;
+        }
+        #usuarios-lista > article.admin-users-row > div.admin-users-actions {
+          text-align: left !important;
+        }
+        #usuarios-lista > article.admin-users-row .flex-wrap {
+          justify-content: flex-start !important;
+        }
+        #usuarios-lista > div.admin-users-empty {
+          min-width: 0 !important;
+        }
+      }
+
+      @media (max-width: 767px) {
+        /* Titulares del header mas compactos en celular */
+        main > header h1 {
+          font-size: 1.75rem !important;
+          line-height: 2rem !important;
+        }
+        /* Modales: padding interno reducido */
+        #teacher-create-modal article,
+        #classroom-edit-modal article {
+          padding: 1.25rem !important;
+          border-radius: 1.5rem !important;
+        }
+        /* Botones en columnas apiladas dentro del header */
+        main > header .grid.sm\:grid-cols-2 {
+          grid-template-columns: 1fr !important;
+        }
+      }
     </style>
 
     <template id="admin-user-row-template">
@@ -1085,7 +1149,7 @@
       </div>
     </template>
 
-    <script src="./js/appState.js?v=20260429-admin-users"></script>
-    <script src="./js/adminDashboard.js?v=20260429-admin-users"></script>
+    <script src="./js/appState.js?v=20260501-responsive"></script>
+    <script src="./js/adminDashboard.js?v=20260501-responsive"></script>
   </body>
 </html>
