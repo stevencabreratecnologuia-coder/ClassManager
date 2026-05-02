@@ -11,10 +11,10 @@
       class="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(20,184,166,0.14),_transparent_24%),radial-gradient(circle_at_bottom_right,_rgba(249,115,22,0.12),_transparent_24%),linear-gradient(180deg,_#020617_0%,_#0f172a_48%,_#111827_100%)]"
     >
       <div
-        class="mx-auto grid min-h-screen max-w-[1600px] lg:grid-cols-[220px_1fr]"
+        class="admin-dashboard-shell mx-auto grid min-h-screen max-w-[1600px]"
       >
         <aside
-          class="border-b border-white/10 bg-slate-950/80 px-4 py-5 backdrop-blur-xl lg:border-b-0 lg:border-r"
+          class="admin-sidebar border-b border-white/10 bg-slate-950/80 px-4 py-5 backdrop-blur-xl lg:border-b-0 lg:border-r"
         >
           <div class="flex items-center gap-3">
             <div
@@ -31,7 +31,7 @@
           </div>
 
           <div
-            class="mt-5 rounded-2xl border border-teal-400/20 bg-teal-400/10 p-3 lg:hidden"
+            class="admin-access-card mt-5 rounded-2xl border border-teal-400/20 bg-teal-400/10 p-3 lg:hidden"
           >
             <p
               class="text-[10px] font-extrabold uppercase tracking-[0.18em] text-teal-300"
@@ -905,6 +905,25 @@
       </article>
     </section>
     <style>
+      .admin-dashboard-shell {
+        grid-template-columns: 1fr;
+      }
+      @media (min-width: 1024px) {
+        .admin-dashboard-shell {
+          grid-template-columns: 220px minmax(0, 1fr);
+        }
+        .admin-sidebar {
+          min-height: 100vh;
+          align-self: stretch;
+        }
+        .admin-access-card {
+          display: none;
+        }
+        .admin-sidebar > div,
+        .admin-sidebar nav {
+          max-width: 100%;
+        }
+      }
       [data-tone="warning"] {
         border-color: rgba(251, 191, 36, 0.22);
         background: rgba(251, 191, 36, 0.1);
