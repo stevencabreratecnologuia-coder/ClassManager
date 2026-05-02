@@ -713,6 +713,55 @@ const renderAdminPanels = () => {
   syncThemeButton();
 };
 
+const setupAdminSectionNavigation = () => {
+  const links = [...document.querySelectorAll("[data-admin-nav-link]")];
+  if (!links.length) return;
+
+  const linkById = new Map(
+    links
+      .map((link) => [link.getAttribute("href")?.replace("#", ""), link])
+      .filter(([id]) => id),
+  );
+
+  const setActiveLink = (sectionId) => {
+    links.forEach((link) => {
+      const isActive = link.getAttribute("href") === `#${sectionId}`;
+      link.classList.toggle("is-active", isActive);
+    });
+  };
+
+  links.forEach((link) => {
+    link.addEventListener("click", () => {
+      const sectionId = link.getAttribute("href")?.replace("#", "");
+      if (sectionId) setActiveLink(sectionId);
+    });
+  });
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      const visibleEntry = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+      if (visibleEntry?.target?.id) {
+        setActiveLink(visibleEntry.target.id);
+      }
+    },
+    {
+      rootMargin: "-18% 0px -62% 0px",
+      threshold: [0.08, 0.2, 0.45],
+    },
+  );
+
+  linkById.forEach((_, sectionId) => {
+    const section = document.getElementById(sectionId);
+    if (section) observer.observe(section);
+  });
+
+  const hashId = window.location.hash.replace("#", "");
+  setActiveLink(linkById.has(hashId) ? hashId : "resumen");
+};
+
 const addAdminChatMessage = (text, role) => {
   if (!chatbotPreviewMessages) return;
 
@@ -1282,6 +1331,7 @@ const initializeAdminDashboard = async () => {
   syncAdminChatMode("profesor");
   resetAdminChatPreview();
   syncUserCreateModalCopy();
+  setupAdminSectionNavigation();
 };
 
 initializeAdminDashboard();
