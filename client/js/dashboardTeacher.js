@@ -786,8 +786,22 @@ const renderAllTeacher = () => {
 };
 
 document.getElementById("close-session")?.addEventListener("click", () => {
-  TeacherApp.clearSession();
-  window.location.href = "./index.html";
+  const finishLogout = () => {
+    TeacherApp.clearSession();
+    window.location.href = "./index.html";
+  };
+
+  if (TeacherApp.runSessionTransition) {
+    TeacherApp.runSessionTransition({
+      title: "Cerrando sesion",
+      detail: "Guardando tu salida y volviendo al login.",
+      tone: "logout",
+      onComplete: finishLogout,
+    });
+    return;
+  }
+
+  finishLogout();
 });
 
 renderAllTeacher();

@@ -1083,6 +1083,88 @@
     }, 0);
   };
 
+  const runSessionTransition = ({
+    title = "Cargando",
+    detail = "Preparando tu panel...",
+    tone = "login",
+    duration = 950,
+    onComplete,
+  } = {}) => {
+    if (typeof document === "undefined") {
+      onComplete?.();
+      return Promise.resolve();
+    }
+
+    const palette =
+      tone === "logout"
+        ? {
+            accent: "#fb7185",
+            soft: "rgba(251,113,133,0.16)",
+            glow: "rgba(251,113,133,0.28)",
+          }
+        : {
+            accent: "#2dd4bf",
+            soft: "rgba(45,212,191,0.16)",
+            glow: "rgba(45,212,191,0.28)",
+          };
+
+    const overlay = document.createElement("div");
+    overlay.setAttribute("role", "status");
+    overlay.setAttribute("aria-live", "polite");
+    overlay.style.cssText = `
+      position: fixed;
+      inset: 0;
+      z-index: 2147483647;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: radial-gradient(circle at 50% 38%, ${palette.glow}, transparent 24%), rgba(2, 6, 23, 0.9);
+      backdrop-filter: blur(18px);
+      opacity: 0;
+      transform: scale(1.02);
+      transition: opacity 220ms ease, transform 220ms ease;
+    `;
+
+    overlay.innerHTML = `
+      <style>
+        @keyframes cm-session-pulse {
+          0%, 100% { transform: scale(0.92); opacity: 0.62; }
+          50% { transform: scale(1.08); opacity: 1; }
+        }
+        @keyframes cm-session-ring {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        @keyframes cm-session-card {
+          from { opacity: 0; transform: translateY(16px) scale(0.96); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+      </style>
+      <div style="width:min(420px,100%);border:1px solid rgba(255,255,255,0.12);border-radius:28px;background:rgba(15,23,42,0.94);box-shadow:0 28px 80px rgba(0,0,0,0.42);padding:28px;color:#f8fafc;text-align:center;animation:cm-session-card 360ms ease both;">
+        <div style="position:relative;width:84px;height:84px;margin:0 auto 20px;border-radius:999px;background:${palette.soft};display:grid;place-items:center;">
+          <div style="position:absolute;inset:-6px;border-radius:inherit;border:3px solid transparent;border-top-color:${palette.accent};border-right-color:rgba(255,255,255,0.18);animation:cm-session-ring 920ms linear infinite;"></div>
+          <div style="width:42px;height:42px;border-radius:14px;background:${palette.accent};color:#020617;display:grid;place-items:center;font:900 14px/1 system-ui,sans-serif;animation:cm-session-pulse 940ms ease-in-out infinite;">CM</div>
+        </div>
+        <h2 style="margin:0;font:900 24px/1.2 system-ui,sans-serif;">${title}</h2>
+        <p style="margin:10px 0 0;color:#cbd5e1;font:500 14px/1.6 system-ui,sans-serif;">${detail}</p>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+    document.body.style.pointerEvents = "none";
+    requestAnimationFrame(() => {
+      overlay.style.opacity = "1";
+      overlay.style.transform = "scale(1)";
+    });
+
+    return new Promise((resolve) => {
+      window.setTimeout(() => {
+        onComplete?.();
+        resolve();
+      }, duration);
+    });
+  };
+
   applyTheme();
 
   window.ClassManagerApp = {
@@ -1145,6 +1227,7 @@
     describeSubmissionFiles,
     downloadCsv,
     downloadExcel,
+    runSessionTransition,
   };
 
   syncStoredSession();

@@ -1032,8 +1032,22 @@ classroomForm?.addEventListener("submit", (event) => {
 });
 
 document.getElementById("close-session")?.addEventListener("click", () => {
-  AdminApp.clearSession();
-  window.location.href = "./index.html";
+  const finishLogout = () => {
+    AdminApp.clearSession();
+    window.location.href = "./index.html";
+  };
+
+  if (AdminApp.runSessionTransition) {
+    AdminApp.runSessionTransition({
+      title: "Cerrando sesion",
+      detail: "Guardando tu salida y volviendo al login.",
+      tone: "logout",
+      onComplete: finishLogout,
+    });
+    return;
+  }
+
+  finishLogout();
 });
 
 adminThemeToggle?.addEventListener("click", () => {

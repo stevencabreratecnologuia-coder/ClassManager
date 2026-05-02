@@ -601,8 +601,22 @@ studentThemeToggle?.addEventListener("click", () => {
 });
 
 document.getElementById("close-session")?.addEventListener("click", () => {
-  StudentApp.clearSession();
-  window.location.href = "./index.html";
+  const finishLogout = () => {
+    StudentApp.clearSession();
+    window.location.href = "./index.html";
+  };
+
+  if (StudentApp.runSessionTransition) {
+    StudentApp.runSessionTransition({
+      title: "Cerrando sesion",
+      detail: "Guardando tu salida y volviendo al login.",
+      tone: "logout",
+      onComplete: finishLogout,
+    });
+    return;
+  }
+
+  finishLogout();
 });
 
 const chatbotSend = document.getElementById("student-chatbot-send");

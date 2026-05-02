@@ -45,6 +45,25 @@ const goToDashboard = (role) => {
   window.location.href = destination;
 };
 
+const goToDashboardWithAnimation = (role) => {
+  const destination = roleToDashboard[role] || "./index.html";
+  const transition = window.ClassManagerApp?.runSessionTransition;
+
+  if (!transition) {
+    window.location.href = destination;
+    return;
+  }
+
+  transition({
+    title: "Iniciando sesion",
+    detail: "Estamos preparando tu panel de ClassManager.",
+    tone: "login",
+    onComplete: () => {
+      window.location.href = destination;
+    },
+  });
+};
+
 const getErrorMessage = (result, fallback) =>
   result?.message || result?.error || fallback;
 
@@ -113,8 +132,8 @@ loginForm?.addEventListener("submit", async (event) => {
     showMessage(loginMessage, "success", "Inicio de sesion exitoso.");
 
     setTimeout(() => {
-      goToDashboard(result.data.user.rol);
-    }, 350);
+      goToDashboardWithAnimation(result.data.user.rol);
+    }, 150);
   } catch (error) {
     if (error?.name === "AbortError") {
       showMessage(
@@ -134,8 +153,8 @@ loginForm?.addEventListener("submit", async (event) => {
       showMessage(loginMessage, "success", "Inicio de sesion local exitoso.");
 
       setTimeout(() => {
-        goToDashboard(localSession.user.rol);
-      }, 350);
+        goToDashboardWithAnimation(localSession.user.rol);
+      }, 150);
       return;
     }
 
