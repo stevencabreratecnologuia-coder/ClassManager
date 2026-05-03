@@ -14,6 +14,7 @@ if (adminSession.user.rol !== "Admin") {
 }
 
 const usersList = document.getElementById("usuarios-lista");
+const usersPagination = document.getElementById("usuarios-pagination");
 const classroomForm = document.getElementById("classroom-form");
 const classroomGradeInput = document.getElementById("classroom-grade");
 const classroomTeacherSelect = document.getElementById("classroom-teacher");
@@ -61,6 +62,8 @@ let adminChatLoading = false;
 let userCreateRole = "Profesor";
 let userActionInFlight = false;
 let remoteUsersCache = [];
+let usersCurrentPage = 1;
+const USERS_PER_PAGE = 4;
 const DEFAULT_REMOTE_TIMEOUT_MS = 15000;
 
 const syncUserCreateModalCopy = () => {
@@ -427,10 +430,65 @@ const getVisibleAdminUsers = () => {
   });
 };
 
+const renderUsersPagination = (totalUsers, totalPages) => {
+  if (!usersPagination) return;
+
+  if (totalUsers <= USERS_PER_PAGE) {
+    usersPagination.innerHTML = "";
+    usersPagination.classList.add("hidden");
+    return;
+  }
+
+  usersPagination.classList.remove("hidden");
+  const start = (usersCurrentPage - 1) * USERS_PER_PAGE + 1;
+  const end = Math.min(usersCurrentPage * USERS_PER_PAGE, totalUsers);
+
+  usersPagination.innerHTML = `
+    <p class="text-xs font-bold text-slate-400">
+      Mostrando <span class="text-white">${start}-${end}</span> de <span class="text-white">${totalUsers}</span> usuarios
+    </p>
+    <div class="flex items-center gap-2">
+      <button
+        type="button"
+        class="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-black text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+        data-users-page-prev
+        ${usersCurrentPage <= 1 ? "disabled" : ""}
+      >
+        Anterior
+      </button>
+      <span class="rounded-xl border border-teal-400/20 bg-teal-400/10 px-3 py-2 text-xs font-black text-teal-100">
+        ${usersCurrentPage} / ${totalPages}
+      </span>
+      <button
+        type="button"
+        class="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-black text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+        data-users-page-next
+        ${usersCurrentPage >= totalPages ? "disabled" : ""}
+      >
+        Siguiente
+      </button>
+    </div>
+  `;
+
+  usersPagination.querySelector("[data-users-page-prev]")?.addEventListener("click", () => {
+    usersCurrentPage = Math.max(1, usersCurrentPage - 1);
+    renderUsers();
+  });
+
+  usersPagination.querySelector("[data-users-page-next]")?.addEventListener("click", () => {
+    usersCurrentPage = Math.min(totalPages, usersCurrentPage + 1);
+    renderUsers();
+  });
+};
+
 const renderUsers = () => {
   if (!usersList) return;
 
   const users = getVisibleAdminUsers();
+  const totalPages = Math.max(1, Math.ceil(users.length / USERS_PER_PAGE));
+  usersCurrentPage = Math.min(Math.max(usersCurrentPage, 1), totalPages);
+  const pageStart = (usersCurrentPage - 1) * USERS_PER_PAGE;
+  const pagedUsers = users.slice(pageStart, pageStart + USERS_PER_PAGE);
   const currentSessionId = String(adminSession?.user?.id ?? "");
   const currentSessionEmail = String(adminSession?.user?.email ?? "")
     .trim()
@@ -443,10 +501,11 @@ const renderUsers = () => {
         No hay usuarios para mostrar todavia. Crea un profesor o administrador para llenar esta lista.
       </div>
     `;
+    renderUsersPagination(0, 1);
     return;
   }
 
-  users.forEach((user) => {
+  pagedUsers.forEach((user) => {
     const isCurrentUser =
       String(user.id) === currentSessionId ||
       String(user.email ?? "").trim().toLowerCase() === currentSessionEmail;
@@ -524,6 +583,8 @@ const renderUsers = () => {
       deleteUserAccount(button.dataset.deleteUser);
     });
   });
+
+  renderUsersPagination(users.length, totalPages);
 };
 
 const exportUsersExcel = () => {
