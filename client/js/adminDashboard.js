@@ -450,18 +450,18 @@ const renderUsersPagination = (totalUsers, totalPages) => {
     <div class="flex items-center gap-2">
       <button
         type="button"
-        class="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-black text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+        class="rounded-full border border-teal-400/20 bg-teal-400/10 px-4 py-2 text-xs font-black text-teal-50 transition hover:border-teal-300/40 hover:bg-teal-400/20 disabled:cursor-not-allowed disabled:border-white/10 disabled:bg-white/5 disabled:text-slate-500"
         data-users-page-prev
         ${usersCurrentPage <= 1 ? "disabled" : ""}
       >
         Anterior
       </button>
-      <span class="rounded-xl border border-teal-400/20 bg-teal-400/10 px-3 py-2 text-xs font-black text-teal-100">
+      <span class="rounded-full border border-teal-400/30 bg-teal-400/15 px-4 py-2 text-xs font-black text-teal-100 shadow-sm shadow-teal-950/20">
         ${usersCurrentPage} / ${totalPages}
       </span>
       <button
         type="button"
-        class="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-black text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+        class="rounded-full border border-teal-400/20 bg-teal-400/10 px-4 py-2 text-xs font-black text-teal-50 transition hover:border-teal-300/40 hover:bg-teal-400/20 disabled:cursor-not-allowed disabled:border-white/10 disabled:bg-white/5 disabled:text-slate-500"
         data-users-page-next
         ${usersCurrentPage >= totalPages ? "disabled" : ""}
       >
@@ -547,9 +547,9 @@ const renderUsers = () => {
                   type="button"
                   class="${
                     nextState
-                      ? "border-teal-400/30 bg-teal-400/10 text-teal-100 hover:bg-teal-400/20"
-                      : "border-amber-400/30 bg-amber-400/10 text-amber-100 hover:bg-amber-400/20"
-                  } rounded-2xl border px-3 py-2 text-xs font-black transition"
+                      ? "border-teal-400/30 bg-teal-400/10 text-teal-100 hover:border-teal-300/50 hover:bg-teal-400/20"
+                      : "border-teal-400/20 bg-white/5 text-slate-100 hover:border-teal-300/40 hover:bg-teal-400/10 hover:text-teal-50"
+                  } rounded-full border px-4 py-2 text-xs font-black transition"
                   data-toggle-user-status="${user.id}"
                   data-next-state="${String(nextState)}"
                 >
@@ -557,7 +557,7 @@ const renderUsers = () => {
                 </button>
                 <button
                   type="button"
-                  class="rounded-2xl border border-rose-400/30 bg-rose-400/10 px-3 py-2 text-xs font-black text-rose-100 transition hover:bg-rose-400/20"
+                  class="rounded-full border border-rose-300/20 bg-rose-400/10 px-4 py-2 text-xs font-black text-rose-100 transition hover:border-rose-300/40 hover:bg-rose-400/20"
                   data-delete-user="${user.id}"
                 >
                   Eliminar
